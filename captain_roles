@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMS Captain Roles & Responsibilities</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Light Theme */
+            --light-bg: #f8f9fa;
+            --light-primary: #2c3e50;
+            --light-secondary: #3498db;
+            --light-accent: #e74c3c;
+            --light-text: #333;
+            --light-card: #ffffff;
+            --light-shadow: rgba(0, 0, 0, 0.1);
+            --light-divider: #e0e0e0;
+            
+            /* Dark Theme */
+            --dark-bg: #121212;
+            --dark-primary: #e0e0e0;
+            --dark-secondary: #64b5f6;
+            --dark-accent: #ff6b6b;
+            --dark-text: #e0e0e0;
+            --dark-card: #1e1e1e;
+            --dark-shadow: rgba(0, 0, 0, 0.4);
+            --dark-divider: #333;
+            
+            /* Neon Theme */
+            --neon-bg: #0a0a1a;
+            --neon-primary: #00f3ff;
+            --neon-secondary: #ff00c8;
+            --neon-accent: #ffd700;
+            --neon-text: #ffffff;
+            --neon-card: rgba(16, 16, 40, 0.8);
+            --neon-shadow: rgba(0, 243, 255, 0.2);
+            --neon-divider: #00f3ff;
+            
+            /* Current Theme */
+            --bg: var(--light-bg);
+            --primary: var(--light-primary);
+            --secondary: var(--light-secondary);
+            --accent: var(--light-accent);
+            --text: var(--light-text);
+            --card: var(--light-card);
+            --shadow: var(--light-shadow);
+            --divider: var(--light-divider);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background 0.5s ease, color 0.5s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* Leadership-themed elements */
+        .leadership-element {
+            position: absolute;
+            z-index: -1;
+            opacity: 0.05;
+        }
+
+        .compass {
+            top: 20%;
+            right: 10%;
+            width: 200px;
+            height: 200px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+        }
+
+        .compass::before, .compass::after {
+            content: "";
+            position: absolute;
+            background: var(--primary);
+        }
+
+        .compass::before {
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+
+        .compass::after {
+            left: 50%;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            transform: translateX(-50%);
+        }
+
+        .shield {
+            bottom: 10%;
+            left: 10%;
+            width: 150px;
+            height: 180px;
+            background: var(--primary);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .star {
+            top: 40%;
+            left: 20%;
+            width: 100px;
+            height: 100px;
+            background: var(--primary);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 50px 20px;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--accent);
+        }
+
+        .theme-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 8px var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .light-btn {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            color: #2c3e50;
+        }
+
+        .dark-btn {
+            background: linear-gradient(135deg, #121212, #2d2d2d);
+            color: #e0e0e0;
+        }
+
+        .neon-btn {
+            background: linear-gradient(135deg, #0a0a1a, #1a1a3a);
+            color: #00f3ff;
+        }
+
+        .intro {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            font-size: 1.1rem;
+            text-align: center;
+            color: var(--text);
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow);
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px var(--shadow);
+        }
+
+        .card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .card h2::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--accent);
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            margin: 20px 0 10px;
+            color: var(--secondary);
+        }
+
+        ul, ol {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin: 60px 0 40px;
+            color: var(--primary);
+            position: relative;
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--accent);
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+
+        .policy-section {
+            background: var(--card);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow);
+            padding: 40px;
+            margin: 40px 0;
+            border-left: 5px solid var(--accent);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+            border-top: 1px solid var(--divider);
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .theme-switcher {
+                position: relative;
+                top: auto;
+                right: auto;
+                justify-content: center;
+                margin-top: 20px;
+            }
+            
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .leadership-element {
+                display: none;
+            }
+            
+            .policy-section {
+                padding: 20px;
+            }
+        }
+
+        /* Theme-specific styles */
+        body.light-theme {
+            --bg: var(--light-bg);
+            --primary: var(--light-primary);
+            --secondary: var(--light-secondary);
+            --accent: var(--light-accent);
+            --text: var(--light-text);
+            --card: var(--light-card);
+            --shadow: var(--light-shadow);
+            --divider: var(--light-divider);
+        }
+
+        body.dark-theme {
+            --bg: var(--dark-bg);
+            --primary: var(--dark-primary);
+            --secondary: var(--dark-secondary);
+            --accent: var(--dark-accent);
+            --text: var(--dark-text);
+            --card: var(--dark-card);
+            --shadow: var(--dark-shadow);
+            --divider: var(--dark-divider);
+        }
+
+        body.neon-theme {
+            --bg: var(--neon-bg);
+            --primary: var(--neon-primary);
+            --secondary: var(--neon-secondary);
+            --accent: var(--neon-accent);
+            --text: var(--neon-text);
+            --card: var(--neon-card);
+            --shadow: var(--neon-shadow);
+            --divider: var(--neon-divider);
+            
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 200, 0.05) 0%, transparent 20%);
+        }
+
+        .neon-theme .card {
+            border: 1px solid rgba(0, 243, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1), 0 10px 30px var(--shadow);
+        }
+
+        .neon-theme .card:hover {
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2), 0 15px 40px var(--shadow);
+        }
+    </style>
+</head>
+<body class="light-theme">
+    <div class="leadership-element compass"></div>
+    <div class="leadership-element shield"></div>
+    <div class="leadership-element star"></div>
+
+    <div class="container">
+        <header>
+            <h1>IMS Captain <span class="highlight">Roles & Responsibilities</span></h1>
+            <p class="intro">Serving as a bridge between the IMS Core Team and Team Leaders, ensuring seamless communication and effective implementation of IMS initiatives.</p>
+            
+            <div class="theme-switcher">
+                <button class="theme-btn light-btn" title="Light Theme"><i class="fas fa-sun"></i></button>
+                <button class="theme-btn dark-btn" title="Dark Theme"><i class="fas fa-moon"></i></button>
+                <button class="theme-btn neon-btn" title="Neon Theme"><i class="fas fa-bolt"></i></button>
+            </div>
+        </header>
+
+        <section>
+            <h2 class="section-title">Overview</h2>
+            <div class="card">
+                <p>The IMS Captain serves as a managerial representative, responsible for conveying and carrying out official IMS tasks, projects, activities, and announcements to IMS Team Leaders (TLs). Acting as a bridge between the IMS Core Team and TLs, the Captain ensures seamless communication and effective implementation of IMS initiatives as outlined in the IMS framework. Captains operate under the leadership of the IMS Community Head and are integral members of the IMS Captains group.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Essential Skills Required</h2>
+            <div class="card">
+                <ul>
+                    <li>Effective decision-making skills</li>
+                    <li>Leadership and management capabilities aligned with the mission of Islam</li>
+                    <li>Teamwork and collaboration within the IMS TLs and Captains</li>
+                    <li>Emotional intelligence to understand group dynamics and address TL concerns</li>
+                    <li>Ability to comprehend, internalize, and communicate the message of Islam effectively</li>
+                    <li>Clear and focused communication of IMS vision and updates to TLs</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Core Responsibilities</h2>
+            <div class="card">
+                <ul>
+                    <li>Clearly explain the IMS mission, vision, policies, and guidelines to all TLs</li>
+                    <li>Foster respectful and insightful discussions on Quran, Seerah, and skill-building topics</li>
+                    <li>Prevent Fiqh debates in the TLs and Captains group to maintain harmony</li>
+                    <li>Prioritize IMS tasks and ensure timely execution</li>
+                    <li>Ensure no TL is manually added; follow the official onboarding procedure</li>
+                    <li>Uphold IMS’s Zero Tolerance Policy and act on violations appropriately</li>
+                    <li>Actively engage in the Captains group by addressing feedback and suggestions from TLs</li>
+                    <li>Support the growth and development of TLs into future IMS Captains</li>
+                    <li>Maintain a list of training methods, techniques, and resources in the Captains group</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Operational Guidelines</h2>
+            <div class="card-container">
+                <div class="card">
+                    <h3>Group Management</h3>
+                    <ul>
+                        <li>Ensure your name and phone number are listed in your group’s description</li>
+                        <li>Example: Co-Captain: Brother Ahmad – +92345xxxxxxx</li>
+                        <li>Do not remove TLs directly; in case of issues, lock the group and inform the Community Head (CH) for final action</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Team Coordination and Strategy</h3>
+                    <ul>
+                        <li>Conduct strategic planning discussions in:
+                            <ul>
+                                <li>Your own group</li>
+                                <li>Captains group</li>
+                                <li>Coordinators group</li>
+                            </ul>
+                        </li>
+                        <li>Co-captain should Coordinate with Captain before implementing plans</li>
+                        <li>Co-captain should represent the group in meetings if the Captain is unavailable</li>
+                        <li>Share meeting minutes in your group for transparency</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Handling Inactive or Exiting Members</h3>
+                    <ul>
+                        <li>If a TL leaves the group:
+                            <ul>
+                                <li>A Captain or Co-Captain of the same gender should follow up</li>
+                                <li>Male Co-Captains must only reach out to male TLs</li>
+                                <li>Request constructive feedback or reason for leaving</li>
+                                <li>Keep a record only if a response is received (no need to log unresponsive cases)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Pre-Session Engagement and Guidance</h3>
+                    <ul>
+                        <li>Before any Seerah session or community activity:
+                            <ul>
+                                <li>Tag all TLs in the group</li>
+                                <li>Send personal reminders to ensure participation</li>
+                                <li>Provide clear guidance if TLs have questions about tasks</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Standard Operating Procedures (SOPs)</h2>
+            <div class="card">
+                <ul>
+                    <li>Attend mandatory weekly meetings with the Community Head (CH)</li>
+                    <li>Inform in advance if unable to attend a scheduled meeting</li>
+                    <li>Submit a written explanation for missing three consecutive internal meetings</li>
+                    <li>Appoint at least two Coordinators (one male, one female) in each group</li>
+                    <li>Complete and deliver all assigned tasks before the stated deadlines</li>
+                    <li>Ensure proper implementation of the Zero-Tolerance Policy in all groups</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Leave and Duty Management</h2>
+            <div class="card">
+                <ul>
+                    <li>Fulfill all responsibilities with seriousness and ownership</li>
+                    <li>Follow instructions and task management protocols from the IMS Core Team</li>
+                    <li>Inform the CH prior to taking leave and ensure a proper handover of duties</li>
+                    <li>Re-inform the CH if the leave extends beyond the initial period</li>
+                    <li>Notify the CH if unable to return to the role</li>
+                    <li>Submit a formal resignation at least one week in advance</li>
+                    <li>Use the notice period to complete a proper handover process</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Policies</h2>
+            <div class="card-container">
+                <div class="policy-section">
+                    <h3>Zero Tolerance Policy: Implementation</h3>
+                    <ul>
+                        <li>Understand and enforce the IMS Zero Tolerance Policy</li>
+                        <li>If a TL violates the policy:
+                            <ul>
+                                <li><strong>First Violation:</strong> Delete the message and share the policy privately only if the TL's message has not been seen by many and no discussion has started. Otherwise, proceed directly to the second violation step</li>
+                                <li><strong>Second Violation:</strong> Lock the chat, send the policy in the group, and issue a warning privately</li>
+                                <li><strong>Third Violation:</strong> Lock the chat and report the situation to the Community Head</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="policy-section">
+                    <h3>Impersonation and Misconduct Policy</h3>
+                    <ul>
+                        <li>Any impersonation of IMS roles or activities will result in immediate removal</li>
+                        <li>Spreading misinformation or making false accusations on behalf of IMS is prohibited</li>
+                        <li>Any form of misconduct or defamation against an IMS member will be dealt with strictly to preserve integrity and discipline</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>IMS Captain Roles & Responsibilities | Leadership Framework</p>
+        <p>© 2023 Islamic Management System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Theme switching functionality
+        document.querySelector('.light-btn').addEventListener('click', () => {
+            document.body.className = 'light-theme';
+        });
+
+        document.querySelector('.dark-btn').addEventListener('click', () => {
+            document.body.className = 'dark-theme';
+        });
+
+        document.querySelector('.neon-btn').addEventListener('click', () => {
+            document.body.className = 'neon-theme';
+        });
+
+        // Card animation on scroll
+        const cards = document.querySelectorAll('.card');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        cards.forEach(card => {
+            card.style.opacity = 0;
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
