@@ -1,1 +1,1 @@
-# standards
+# Quran_Word2Word

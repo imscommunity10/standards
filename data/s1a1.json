@@ -1,0 +1,25 @@
+{
+  "surah": 1,
+  "ayah": 1,
+  "ayahWords": ["بِسْمِ", "اللّٰهِ", "الرَّحْمٰنِ", "الرَّحِيْمِ"],
+  "wordDetails": [
+    {"word":"بِسْمِ", "meaning":"In the name", "rootMeaning":"اسم", "grammar":"Noun", "purpose":"Opening", "tafsir":"Starts all actions"},
+    {"word":"اللّٰهِ", "meaning":"of Allah", "rootMeaning":"الله", "grammar":"Proper noun", "purpose":"Divine identity", "tafsir":"God's name"},
+    {"word":"الرَّحْمٰنِ", "meaning":"The Most Gracious", "rootMeaning":"رحم", "grammar":"Adjective", "purpose":"Attribute", "tafsir":"Comprehensive mercy"},
+    {"word":"الرَّحِيْمِ", "meaning":"The Most Merciful", "rootMeaning":"رحم", "grammar":"Adjective", "purpose":"Attribute", "tafsir":"Personalized mercy"}
+  ],
+  "ayahDetails": {
+    "translation":"In the name of Allah, the Most Gracious, the Most Merciful.",
+    "tafsir":"This ayah emphasizes beginning with the remembrance of Allah.",
+    "theme":"Introduction to Divine Mercy",
+    "philosophy":"Action with intention and remembrance",
+    "psychology":"Encouragement and calmness",
+    "task":"Begin with Bismillah",
+    "elements":"Mercy, Grace",
+    "science":"Mental health impact",
+    "politics":"N/A",
+    "society":"Spiritual influence in community",
+    "virtues":"Earn blessings",
+    "refLink":"https://example.com/s1a1"
+  }
+}
