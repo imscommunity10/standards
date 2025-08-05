@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <title>Circular Image</title>
     <style>
         body {
             display: flex;
@@ -8,19 +10,18 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            background: #f0f0f0;
         }
         .circular-image {
             width: 200px;
             height: 200px;
             border-radius: 50%;
             object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 <body>
-    <!-- Try this modified Google Drive URL format -->
-    <img class="circular-image" 
-         src="https://drive.google.com/uc?export=view&id=1Nri3BLkATpTxOLuDEp0YMUzStf072Qyb" 
-         alt="Circular Image">
+    <img class="circular-image" src="https://lh3.googleusercontent.com/d/1Nri3BLkATpTxOLuDEp0YMUzStf072Qyb=s200" alt="Circular Image">
 </body>
 </html>
