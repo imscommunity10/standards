@@ -544,6 +544,30 @@
             background: #f0f0f0; /* Fallback background */
         }
 
+        .placeholder-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.05);
+            color: var(--secondary);
+        }
+        
+        .placeholder-img i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .placeholder-img p {
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
         .task-content {
             padding: 20px;
             flex: 1;
@@ -1309,33 +1333,6 @@
             return buttons;
         };
         
-        // Extract file ID from Google Drive URL
-        const extractFileId = (url) => {
-            if (!url) return null;
-            
-            // Handle direct link format: https://drive.google.com/uc?export=view&id=FILE_ID
-            const match1 = url.match(/[?&]id=([^&]+)/);
-            if (match1) return match1[1];
-            
-            // Handle open link format: https://drive.google.com/open?id=FILE_ID
-            const match2 = url.match(/[?&]id=([^&]+)/);
-            if (match2) return match2[1];
-            
-            // Handle file/d/ format: https://drive.google.com/file/d/FILE_ID/view
-            const match3 = url.match(/\/file\/d\/([^/]+)/);
-            if (match3) return match3[1];
-            
-            return null;
-        };
-        
-        // Generate direct image URL from Google Drive
-        const generateDriveImageUrl = (url) => {
-            const fileId = extractFileId(url);
-            if (!fileId) return '';
-            
-            return `https://drive.google.com/uc?id=${fileId}`;
-        };
-        
         // Fetch and display tasks
         const fetchTasks = async () => {
             try {
@@ -1384,7 +1381,8 @@
                 taskCard.className = 'task-card';
                 taskCard.dataset.status = task['Status'].toLowerCase().replace('comming soon', 'coming soon');
                 
-                const previewLink = generateDriveImageUrl(task['PreviewLink']) || '';
+                // Use PreviewLink directly without conversion
+                const previewLink = task['PreviewLink'] || '';
                 const taskName = task['Name of the Task?'] || 'Untitled Task';
                 
                 taskCard.innerHTML = `
@@ -1392,7 +1390,7 @@
                         <img src="${previewLink}" 
                              alt="${taskName}" 
                              class="task-thumbnail"
-                             onerror="this.onerror=null; this.src=''; this.outerHTML='<div class=\'placeholder-img\'><i class=\'fas fa-image\'></i><p>Image unavailable</p></div>';">
+                             onerror="this.onerror=null; this.outerHTML='<div class=\\'placeholder-img\\'><i class=\\'fas fa-image\\'></i><p>Image unavailable</p></div>';">
                     </div>
                     <div class="task-content">
                         <h3 class="task-title">${taskName}</h3>
@@ -1428,9 +1426,9 @@
         const showTaskDetails = (task) => {
             document.getElementById('modalTitle').textContent = task['Name of the Task?'] || 'Untitled Task';
             
-            // Set image
+            // Set image - use PreviewLink directly
             const modalImg = document.getElementById('modalImg');
-            const previewLink = generateDriveImageUrl(task['PreviewLink']) || '';
+            const previewLink = task['PreviewLink'] || '';
             modalImg.src = previewLink;
             modalImg.alt = task['Name of the Task?'] || 'Task Thumbnail';
             
