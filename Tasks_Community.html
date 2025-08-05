@@ -524,6 +524,7 @@
             width: 100%;
             padding-top: 100%; /* 1:1 Aspect Ratio */
             overflow: hidden;
+            background: rgba(0,0,0,0.05); /* Fallback background */
         }
 
         .task-thumbnail {
@@ -534,6 +535,7 @@
             height: 100%;
             object-fit: cover;
             border-bottom: 3px solid var(--accent);
+            background: #f0f0f0; /* Fallback background */
         }
 
         .task-content {
@@ -1248,7 +1250,7 @@
             switch (status.toLowerCase()) {
                 case 'active': return 'status-active';
                 case 'completed': return 'status-completed';
-                case 'comming soon': return 'status-coming-soon';
+                case 'coming soon': return 'status-coming-soon';
                 default: return '';
             }
         };
@@ -1301,6 +1303,20 @@
             return buttons;
         };
         
+        // Improved image error handling
+        const handleImageError = (imgElement, taskName) => {
+            imgElement.onerror = null;
+            imgElement.src = '';
+            imgElement.outerHTML = `
+                <div class="task-thumbnail-container">
+                    <div class="placeholder-img">
+                        <i class="fas fa-image"></i>
+                        <p>Image unavailable</p>
+                    </div>
+                </div>
+            `;
+        };
+        
         // Fetch and display tasks
         const fetchTasks = async () => {
             try {
@@ -1349,15 +1365,18 @@
                 taskCard.className = 'task-card';
                 taskCard.dataset.status = task['Status'].toLowerCase().replace('comming soon', 'coming soon');
                 
+                const previewLink = task['PreviewLink'] || '';
+                const taskName = task['Name of the Task?'] || 'Untitled Task';
+                
                 taskCard.innerHTML = `
                     <div class="task-thumbnail-container">
-                        <img src="${task['PreviewLink']}" 
-                             alt="${task['Name of the Task?']}" 
+                        <img src="${previewLink}" 
+                             alt="${taskName}" 
                              class="task-thumbnail"
-                             onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23f0f0f0\'/><text x=\'50\' y=\'50\' font-family=\'Arial\' font-size=\'10\' text-anchor=\'middle\' fill=\'%23000\'>No Preview</text></svg>'">
+                             onerror="handleImageError(this, '${taskName.replace(/'/g, "\\'")}')">
                     </div>
                     <div class="task-content">
-                        <h3 class="task-title">${task['Name of the Task?']}</h3>
+                        <h3 class="task-title">${taskName}</h3>
                         <div class="task-status ${getStatusClass(task['Status'])}">${task['Status']}</div>
                     </div>
                 `;
@@ -1394,6 +1413,18 @@
             const modalImg = document.getElementById('modalImg');
             modalImg.src = task['PreviewLink'] || '';
             modalImg.alt = task['Name of the Task?'] || 'Task Thumbnail';
+            
+            // Handle image error in modal
+            modalImg.onerror = function() {
+                this.onerror = null;
+                this.src = '';
+                this.parentElement.innerHTML = `
+                    <div class="placeholder-img">
+                        <i class="fas fa-image"></i>
+                        <p>Image unavailable</p>
+                    </div>
+                `;
+            };
             
             // Set status
             document.getElementById('modalStatus').textContent = task['Status'] || 'Unknown Status';
