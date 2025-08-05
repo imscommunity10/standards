@@ -1,1296 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMS Task Management</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            /* Light Theme */
-            --light-bg: #f8f9fa;
-            --light-primary: #2c3e50;
-            --light-secondary: #3498db;
-            --light-accent: #e74c3c;
-            --light-text: #333;
-            --light-card: #ffffff;
-            --light-shadow: rgba(0, 0, 0, 0.1);
-            --light-divider: #e0e0e0;
-            
-            /* Dark Theme */
-            --dark-bg: #121212;
-            --dark-primary: #e0e0e0;
-            --dark-secondary: #64b5f6;
-            --dark-accent: #ff6b6b;
-            --dark-text: #e0e0e0;
-            --dark-card: #1e1e1e;
-            --dark-shadow: rgba(0, 0, 0, 0.4);
-            --dark-divider: #333;
-            
-            /* Neon Theme */
-            --neon-bg: #0a0a1a;
-            --neon-primary: #00f3ff;
-            --neon-secondary: #ff00c8;
-            --neon-accent: #ffd700;
-            --neon-text: #ffffff;
-            --neon-card: rgba(16, 16, 40, 0.8);
-            --neon-shadow: rgba(0, 243, 255, 0.2);
-            --neon-divider: #00f3ff;
-            
-            /* Current Theme */
-            --bg: var(--light-bg);
-            --primary: var(--light-primary);
-            --secondary: var(--light-secondary);
-            --accent: var(--light-accent);
-            --text: var(--light-text);
-            --card: var(--light-card);
-            --shadow: var(--light-shadow);
-            --divider: var(--light-divider);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            transition: background 0.5s ease, color 0.5s ease;
-            position: relative;
-            overflow-x: hidden;
-            padding-top: 80px; /* Space for sticky nav */
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: -1;
-            opacity: 0.3;
-        }
-
-        /* Leadership-themed elements */
-        .leadership-element {
-            position: absolute;
-            z-index: -1;
-            opacity: 0.05;
-        }
-
-        .compass {
-            top: 20%;
-            right: 10%;
-            width: 200px;
-            height: 200px;
-            border: 2px solid var(--primary);
-            border-radius: 50%;
-        }
-
-        .compass::before, .compass::after {
-            content: "";
-            position: absolute;
-            background: var(--primary);
-        }
-
-        .compass::before {
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            transform: translateY(-50%);
-        }
-
-        .compass::after {
-            left: 50%;
-            top: 0;
-            height: 100%;
-            width: 2px;
-            transform: translateX(-50%);
-        }
-
-        .shield {
-            bottom: 10%;
-            left: 10%;
-            width: 150px;
-            height: 180px;
-            background: var(--primary);
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-        }
-
-        .star {
-            top: 40%;
-            left: 20%;
-            width: 100px;
-            height: 100px;
-            background: var(--primary);
-            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Navigation Bar - Sticky */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--card);
-            box-shadow: 0 2px 15px var(--shadow);
-            z-index: 1000;
-            transition: all 0.4s ease;
-            padding: 15px 0;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 15px;
-        }
-
-        .nav-btn {
-            background: transparent;
-            color: var(--text);
-            border: 2px solid var(--secondary);
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            text-align: center;
-            display: inline-block;
-            position: relative;
-        }
-
-        .nav-btn:hover {
-            background: var(--secondary);
-            color: var(--card);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px var(--shadow);
-        }
-
-        .nav-btn i {
-            margin-right: 8px;
-        }
-        
-        /* Dropdown Styles */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: var(--card);
-            min-width: 250px;
-            box-shadow: 0 8px 16px var(--shadow);
-            border-radius: 8px;
-            z-index: 1;
-            top: 100%;
-            left: 0;
-            margin-top: 5px;
-            border: 1px solid var(--divider);
-            overflow: hidden;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        
-        .dropdown:hover .dropdown-content,
-        .dropdown:focus-within .dropdown-content {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .dropdown-content a {
-            color: var(--text);
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            text-align: left;
-            transition: all 0.2s ease;
-            border-bottom: 1px solid var(--divider);
-        }
-        
-        .dropdown-content a:hover {
-            background-color: var(--secondary);
-            color: var(--card);
-            padding-left: 20px;
-        }
-        
-        .dropdown-content a i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-        
-        .dropdown-btn {
-            display: flex;
-            align-items: center;
-        }
-        
-        .dropdown-btn::after {
-            content: "\f107";
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            margin-left: 8px;
-            transition: transform 0.3s ease;
-        }
-        
-        .dropdown:hover .dropdown-btn::after {
-            transform: rotate(180deg);
-        }
-        
-        /* Floating Corner Button */
-        .floating-nav-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--secondary);
-            color: var(--card);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 999;
-            box-shadow: 0 5px 15px var(--shadow);
-            transition: all 0.3s ease;
-            opacity: 0;
-            transform: translateY(20px);
-            visibility: hidden;
-        }
-        
-        .floating-nav-btn.active {
-            opacity: 1;
-            transform: translateY(0);
-            visibility: visible;
-        }
-        
-        .floating-nav-btn:hover {
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 8px 20px var(--shadow);
-        }
-
-        /* Hamburger Menu */
-        .hamburger {
-            display: none;
-            cursor: pointer;
-            background: transparent;
-            border: none;
-            color: var(--primary);
-            font-size: 1.8rem;
-        }
-
-        header {
-            text-align: center;
-            padding: 50px 20px;
-            position: relative;
-        }
-
-        h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            color: var(--primary);
-            position: relative;
-            display: inline-block;
-        }
-
-        h1::after {
-            content: "";
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 4px;
-            background: var(--accent);
-        }
-
-        .theme-switcher {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .theme-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 8px var(--shadow);
-            transition: transform 0.3s ease;
-        }
-
-        .theme-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .light-btn {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            color: #2c3e50;
-        }
-
-        .dark-btn {
-            background: linear-gradient(135deg, #121212, #2d2d2d);
-            color: #e0e0e0;
-        }
-
-        .neon-btn {
-            background: linear-gradient(135deg, #0a0a1a, #1a1a3a);
-            color: #00f3ff;
-        }
-
-        .intro {
-            max-width: 800px;
-            margin: 0 auto 40px;
-            font-size: 1.1rem;
-            text-align: center;
-            color: var(--text);
-        }
-
-        /* Task Section Styles */
-        .section-title {
-            font-size: 2.5rem;
-            text-align: center;
-            margin: 60px 0 40px;
-            color: var(--primary);
-            position: relative;
-        }
-
-        .section-title::after {
-            content: "";
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 4px;
-            background: var(--accent);
-        }
-
-        .filters {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            background: var(--card);
-            border: 2px solid var(--secondary);
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .filter-btn.active {
-            background: var(--secondary);
-            color: var(--card);
-        }
-
-        .filter-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px var(--shadow);
-        }
-
-        .tasks-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            margin-bottom: 50px;
-        }
-
-        .task-card {
-            background: var(--card);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px var(--shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
-        }
-
-        .task-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px var(--shadow);
-        }
-
-        .task-img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-bottom: 3px solid var(--secondary);
-        }
-
-        .task-content {
-            padding: 20px;
-        }
-
-        .task-title {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            color: var(--primary);
-            font-weight: 600;
-            min-height: 70px;
-        }
-
-        .task-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-        }
-
-        .task-organizer {
-            background: var(--secondary);
-            color: var(--card);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .task-status {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-active {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .status-completed {
-            background: #9E9E9E;
-            color: white;
-        }
-
-        .status-comming-soon {
-            background: #FF9800;
-            color: white;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            z-index: 2000;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: var(--card);
-            margin: 5% auto;
-            border-radius: 15px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            max-width: 900px;
-            position: relative;
-            animation: modalOpen 0.4s ease-out;
-        }
-
-        @keyframes modalOpen {
-            from { opacity: 0; transform: translateY(-50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 1.8rem;
-            color: var(--accent);
-            cursor: pointer;
-            z-index: 10;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .close-modal:hover {
-            background: rgba(231, 76, 60, 0.1);
-            transform: rotate(90deg);
-        }
-
-        .modal-header {
-            position: relative;
-        }
-
-        .modal-img {
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-            border-radius: 15px 15px 0 0;
-        }
-
-        .modal-body {
-            padding: 30px;
-        }
-
-        .modal-title {
-            font-size: 2.2rem;
-            margin-bottom: 15px;
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        .modal-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .modal-organizer, .modal-status {
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .modal-organizer {
-            background: var(--secondary);
-            color: var(--card);
-        }
-
-        .modal-status {
-            background: #FF9800;
-            color: white;
-        }
-
-        .modal-section {
-            margin-bottom: 30px;
-        }
-
-        .modal-section h3 {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            color: var(--secondary);
-            position: relative;
-            padding-bottom: 10px;
-        }
-
-        .modal-section h3::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 50px;
-            height: 3px;
-            background: var(--accent);
-        }
-
-        .modal-section p, .modal-section li {
-            margin-bottom: 12px;
-            line-height: 1.7;
-        }
-
-        .modal-section ul {
-            padding-left: 25px;
-        }
-
-        .modal-section li {
-            position: relative;
-            padding-left: 20px;
-        }
-
-        .modal-section li::before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: var(--accent);
-            font-size: 1.2rem;
-        }
-
-        .modal-team {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .team-member {
-            background: rgba(52, 152, 219, 0.1);
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 50px;
-            font-size: 1.2rem;
-            color: var(--text);
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(52, 152, 219, 0.2);
-            border-top: 5px solid var(--secondary);
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        footer {
-            text-align: center;
-            padding: 30px;
-            margin-top: 50px;
-            border-top: 1px solid var(--divider);
-            color: var(--text);
-            font-size: 0.9rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            h1 {
-                font-size: 3rem;
-            }
-            
-            .nav-buttons {
-                gap: 10px;
-            }
-            
-            .nav-btn {
-                padding: 8px 15px;
-                font-size: 0.9rem;
-            }
-            
-            .modal-content {
-                margin: 10% auto;
-            }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding-top: 70px;
-            }
-            
-            h1 {
-                font-size: 2.5rem;
-            }
-            
-            .theme-switcher {
-                position: relative;
-                top: auto;
-                right: auto;
-                justify-content: center;
-                margin-top: 20px;
-            }
-            
-            .leadership-element {
-                display: none;
-            }
-            
-            /* Mobile Navigation */
-            .navbar {
-                padding: 10px 0;
-            }
-            
-            .nav-container {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-            }
-            
-            .nav-buttons {
-                flex-direction: column;
-                width: 100%;
-                gap: 10px;
-                max-height: 0;
-                overflow: hidden;
-                transition: max-height 0.4s ease;
-            }
-            
-            .nav-buttons.active {
-                max-height: 500px;
-                margin-top: 50px;
-            }
-            
-            .nav-btn {
-                width: 100%;
-                text-align: left;
-                padding: 12px 15px;
-            }
-            
-            .hamburger {
-                display: block;
-                position: absolute;
-                right: 20px;
-                top: 15px;
-                margin-bottom: 10px;
-            }
-            
-            /* Dropdown adjustments for mobile */
-            .dropdown-content {
-                position: static;
-                display: none;
-                box-shadow: none;
-                width: 100%;
-                margin-top: 0;
-                opacity: 1;
-                transform: none;
-            }
-            
-            .dropdown:hover .dropdown-content,
-            .dropdown.active .dropdown-content {
-                display: block;
-            }
-            
-            .dropdown-btn::after {
-                float: right;
-                margin-top: 5px;
-            }
-            
-            .dropdown:hover .dropdown-btn::after {
-                transform: none;
-            }
-            
-            .modal-content {
-                margin: 15% auto;
-            }
-            
-            .modal-img {
-                height: 250px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .section-title {
-                font-size: 2rem;
-            }
-            
-            .intro {
-                font-size: 1rem;
-            }
-            
-            .floating-nav-btn {
-                bottom: 20px;
-                right: 20px;
-                width: 50px;
-                height: 50px;
-                font-size: 1.3rem;
-            }
-            
-            .modal-content {
-                margin: 20% auto;
-            }
-        }
-
-        /* Theme-specific styles */
-        body.light-theme {
-            --bg: var(--light-bg);
-            --primary: var(--light-primary);
-            --secondary: var(--light-secondary);
-            --accent: var(--light-accent);
-            --text: var(--light-text);
-            --card: var(--light-card);
-            --shadow: var(--light-shadow);
-            --divider: var(--light-divider);
-        }
-
-        body.dark-theme {
-            --bg: var(--dark-bg);
-            --primary: var(--dark-primary);
-            --secondary: var(--dark-secondary);
-            --accent: var(--dark-accent);
-            --text: var(--dark-text);
-            --card: var(--dark-card);
-            --shadow: var(--dark-shadow);
-            --divider: var(--dark-divider);
-        }
-
-        body.neon-theme {
-            --bg: var(--neon-bg);
-            --primary: var(--neon-primary);
-            --secondary: var(--neon-secondary);
-            --accent: var(--neon-accent);
-            --text: var(--neon-text);
-            --card: var(--neon-card);
-            --shadow: var(--neon-shadow);
-            --divider: var(--neon-divider);
-            
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.05) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(255, 0, 200, 0.05) 0%, transparent 20%);
-        }
-
-        .neon-theme .task-card {
-            border: 1px solid rgba(0, 243, 255, 0.1);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1), 0 10px 30px var(--shadow);
-        }
-
-        .neon-theme .task-card:hover {
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2), 0 15px 40px var(--shadow);
-        }
-        
-        .neon-theme .dropdown-content {
-            border: 1px solid rgba(0, 243, 255, 0.2);
-        }
-        
-        .neon-theme .navbar {
-            background-color: rgba(16, 16, 40, 0.95);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMS Tasks</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      padding: 2rem;
+      background: #f4f4f4;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+    }
+    .task-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 2rem;
+    }
+    .task {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+    .task img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .task h3 {
+      margin: 0.8rem 0 0.5rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+    .active { background: #4caf50; color: #fff; }
+    .completed { background: #999; color: #fff; }
+    .coming-soon { background: #ff9800; color: #fff; }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px; right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #e74c3c;
+    }
+    .modal h2 { margin-top: 0; }
+    .modal-section { margin-bottom: 1rem; }
+  </style>
 </head>
-<body class="light-theme">
-    <div class="leadership-element compass"></div>
-    <div class="leadership-element shield"></div>
-    <div class="leadership-element star"></div>
+<body>
+  <h1 id="page-title">IMS Tasks</h1>
+  <div class="task-list" id="taskList"></div>
 
-<!-- Sticky Navigation Bar -->
-<nav class="navbar">
-    <div class="nav-container">
-        <button class="hamburger" id="hamburger">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="nav-buttons" id="navButtons">
-            <a href="Announcements.html" class="nav-btn">
-                <i class="fas fa-bullhorn"></i> Announcements
-            </a>
-
-            <!-- Roles & Responsibilities Dropdown -->
-            <div class="dropdown" id="rolesDropdown">
-                <button class="nav-btn dropdown-btn">
-                    <i class="fas fa-users"></i> Roles & Responsibilities
-                </button>
-                <div class="dropdown-content">
-                    <a href="Captain-Role.html">
-                        <i class="fas fa-star"></i> Captain's Role
-                    </a>
-                    <!-- Add more roles here when needed -->
-                </div>
-            </div>
-
-            <a href="Projects.html" class="nav-btn">
-                <i class="fas fa-tasks"></i> Projects
-            </a>
-
-            <!-- Tasks Dropdown -->
-            <div class="dropdown" id="tasksDropdown">
-                <button class="nav-btn dropdown-btn">
-                    <i class="fas fa-list-check"></i> Tasks
-                </button>
-                <div class="dropdown-content">
-                    <a href="Tasks_IMS.html">
-                        <i class="fas fa-network-wired"></i> IMS
-                    </a>
-                    <a href="Tasks_Community.html">
-                        <i class="fas fa-users-cog"></i> Community
-                    </a>
-                    <a href="Tasks_Group.html">
-                        <i class="fas fa-layer-group"></i> Group
-                    </a>
-                </div>
-            </div>
-        </div>
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="modal-close" id="modalClose">&times;</span>
+      <img id="modalImg" src="" alt="Thumbnail" style="width:100%; border-radius:8px; max-height:300px; object-fit:cover;" />
+      <h2 id="modalTitle"></h2>
+      <div class="badge" id="modalStatus"></div>
+      <div class="modal-section"><strong>Problem Statement:</strong><p id="modalProblem"></p></div>
+      <div class="modal-section"><strong>Purpose / Goal:</strong><p id="modalPurpose"></p></div>
+      <div class="modal-section"><strong>Objectives:</strong><p id="modalObjectives"></p></div>
+      <div class="modal-section"><strong>Expected Outcomes:</strong><p id="modalOutcomes"></p></div>
+      <div class="modal-section"><strong>Description:</strong><p id="modalDescription"></p></div>
+      <div class="modal-section"><strong>Schedule:</strong><p id="modalSchedule"></p></div>
+      <div class="modal-section"><strong>Platforms & Links:</strong><p id="modalPlatforms"></p></div>
     </div>
-</nav>
-    
-    <!-- Floating Navigation Button for Mobile -->
-    <div class="floating-nav-btn" id="floatingNavBtn">
-        <i class="fas fa-bars"></i>
-    </div>
+  </div>
 
-    <div class="container">
-        <header>
-            <h1>IMS Task <span class="highlight">Management</span></h1>
-            <p class="intro">Track, manage, and collaborate on all IMS tasks across teams and projects</p>
-            
-            <div class="theme-switcher">
-                <button class="theme-btn light-btn" title="Light Theme"><i class="fas fa-sun"></i></button>
-                <button class="theme-btn dark-btn" title="Dark Theme"><i class="fas fa-moon"></i></button>
-                <button class="theme-btn neon-btn" title="Neon Theme"><i class="fas fa-bolt"></i></button>
-            </div>
-        </header>
+  <script>
+    const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjWBMOs8uUG-0lF5zsC7gEwL_2rmU5ClfDdetELXRhOAKvs06wYf4il25dMDgREJARX3jK08YADpthOIWiDujOmKfk_scPUDX7jfxJCRgnjflG7C7dRDMsoqSFAwax1ypU5yXz5Aca7CZ3euDOmMyU1kC0hd6-DFblEPsNszJ6ymoh8DXgdfBKD3huKBqSyd9C3aqyLlHr6aqlAuqnOX10Q3KkcXiohHeirrfbe4DcjsRwby8i1ELWmMzxrOnzRKH7tTkifIbsZ3Lb41nHGH3PW_VKKkg&lib=M8aPa8hsGYk5N72Vlek1ofpz1wr5Ew8Dp';
 
-        <section>
-            <h2 class="section-title">Community Tasks</h2>
-            
-            <div class="filters">
-                <button class="filter-btn active" data-filter="all">All Tasks</button>
-                <button class="filter-btn" data-filter="active">Active</button>
-                <button class="filter-btn" data-filter="completed">Completed</button>
-                <button class="filter-btn" data-filter="comming-soon">Coming Soon</button>
-            </div>
-            
-            <div class="tasks-container" id="tasksContainer">
-                <!-- Loading spinner -->
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <p>Loading community tasks...</p>
-                </div>
-            </div>
-        </section>
-    </div>
+    const container = document.getElementById('taskList');
+    const modal = document.getElementById('modal');
+    const modalClose = document.getElementById('modalClose');
 
-    <!-- Task Detail Modal -->
-    <div id="taskModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" id="closeModal">&times;</span>
-            <div class="modal-header">
-                <img id="modalImg" class="modal-img" src="" alt="Task Image">
-            </div>
-            <div class="modal-body">
-                <h2 id="modalTitle" class="modal-title"></h2>
-                <div class="modal-meta">
-                    <span id="modalOrganizer" class="modal-organizer"></span>
-                    <span id="modalStatus" class="modal-status"></span>
-                </div>
-                
-                <div class="modal-section">
-                    <h3>Problem Statement</h3>
-                    <p id="modalProblem"></p>
-                </div>
-                
-                <div class="modal-section">
-                    <h3>Purpose & Goal</h3>
-                    <p id="modalPurpose"></p>
-                </div>
-                
-                <div class="modal-section">
-                    <h3>Objectives</h3>
-                    <p id="modalObjectives"></p>
-                </div>
-                
-                <div class="modal-section">
-                    <h3>Expected Outcomes</h3>
-                    <p id="modalOutcomes"></p>
-                </div>
-                
-                <div class="modal-section">
-                    <h3>Task Description</h3>
-                    <p id="modalDescription"></p>
-                </div>
-                
-                <div class="modal-section">
-                    <h3>Schedule</h3>
-                    <p id="modalSchedule"></p>
-                </div>
-                
-                <div class="modal-section">
-                    <h3>Platforms & Links</h3>
-                    <p id="modalPlatforms"></p>
-                </div>
-                
-                <div class="modal-section">
-                    <h3>Team Members</h3>
-                    <div class="modal-team" id="modalTeam"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    const modalTitle = document.getElementById('modalTitle');
+    const modalImg = document.getElementById('modalImg');
+    const modalStatus = document.getElementById('modalStatus');
+    const modalProblem = document.getElementById('modalProblem');
+    const modalPurpose = document.getElementById('modalPurpose');
+    const modalObjectives = document.getElementById('modalObjectives');
+    const modalOutcomes = document.getElementById('modalOutcomes');
+    const modalDescription = document.getElementById('modalDescription');
+    const modalSchedule = document.getElementById('modalSchedule');
+    const modalPlatforms = document.getElementById('modalPlatforms');
 
-    <footer>
-        <p>IMS Task Management System</p>
-    </footer>
+    const getPageType = () => {
+      const path = window.location.pathname.toLowerCase();
+      if (path.includes('community')) return 'Community';
+      if (path.includes('group')) return 'Group';
+      if (path.includes('ims')) return 'IMS';
+      return null;
+    };
 
-    <script>
-        // API Configuration
-        const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjWBMOs8uUG-0lF5zsC7gEwL_2rmU5ClfDdetELXRhOAKvs06wYf4il25dMDgREJARX3jK08YADpthOIWiDujOmKfk_scPUDX7jfxJCRgnjflG7C7dRDMsoqSFAwax1ypU5yXz5Aca7CZ3euDOmMyU1kC0hd6-DFblEPsNszJ6ymoh8DXgdfBKD3huKBqSyd9C3aqyLlHr6aqlAuqnOX10Q3KkcXiohHeirrfbe4DcjsRwby8i1ELWmMzxrOnzRKH7tTkifIbsZ3Lb41nHGH3PW_VKKkg&lib=M8aPa8hsGYk5N72Vlek1ofpz1wr5Ew8Dp';
-        
-        // DOM Elements
-        const tasksContainer = document.getElementById('tasksContainer');
-        const taskModal = document.getElementById('taskModal');
-        const closeModal = document.getElementById('closeModal');
-        const filterButtons = document.querySelectorAll('.filter-btn');
-        
-        // Theme switching functionality
-        document.querySelector('.light-btn').addEventListener('click', () => {
-            document.body.className = 'light-theme';
+    const getStatusClass = (status) => {
+      switch (status.toLowerCase()) {
+        case 'active': return 'badge active';
+        case 'completed': return 'badge completed';
+        case 'comming soon': return 'badge coming-soon';
+        default: return 'badge';
+      }
+    };
+
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => {
+        const filterType = getPageType();
+        const filtered = data.filter(item => item['Who is this task organized by?']?.toLowerCase() === filterType.toLowerCase());
+
+        filtered.forEach(task => {
+          const card = document.createElement('div');
+          card.className = 'task';
+          card.innerHTML = `
+            <img src="${task['PreviewLink'] || ''}" alt="Thumbnail" />
+            <h3>${task['Name of the Task?']}</h3>
+            <div class="${getStatusClass(task['Status'])}">${task['Status']}</div>
+          `;
+          card.onclick = () => {
+            modal.style.display = 'flex';
+            modalTitle.textContent = task['Name of the Task?'];
+            modalImg.src = task['PreviewLink'] || '';
+            modalStatus.textContent = task['Status'];
+            modalStatus.className = getStatusClass(task['Status']);
+            modalProblem.textContent = task['Problem Statement?'];
+            modalPurpose.textContent = task['Purpose / Goal of the Task?'];
+            modalObjectives.textContent = task['Objectives'];
+            modalOutcomes.textContent = task['Expected or Achieved Outcomes?'];
+            modalDescription.textContent = task["Task's Description"];
+            modalSchedule.textContent = task['Scheduled Task Timing '];
+            modalPlatforms.textContent = task['Platform Names & Join links'];
+          };
+          container.appendChild(card);
         });
+      });
 
-        document.querySelector('.dark-btn').addEventListener('click', () => {
-            document.body.className = 'dark-theme';
-        });
-
-        document.querySelector('.neon-btn').addEventListener('click', () => {
-            document.body.className = 'neon-theme';
-        });
-
-        // Filter tasks
-        filterButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                // Remove active class from all buttons
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                // Add active class to clicked button
-                button.classList.add('active');
-                
-                // Get filter value
-                const filter = button.dataset.filter;
-                
-                // Filter tasks
-                const taskCards = document.querySelectorAll('.task-card');
-                taskCards.forEach(card => {
-                    const status = card.dataset.status.toLowerCase().replace(' ', '-');
-                    
-                    if (filter === 'all' || status === filter) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            });
-        });
-
-        // Fetch tasks from API
-        async function fetchTasks() {
-            try {
-                const response = await fetch(API_URL);
-                const tasks = await response.json();
-                
-                // Filter tasks by organizer (Community, Group, or IMS)
-                const organizer = getOrganizerFromURL();
-                const filteredTasks = tasks.filter(task => 
-                    task['Who is this task organized by?'] === organizer
-                );
-                
-                renderTasks(filteredTasks);
-            } catch (error) {
-                console.error('Error fetching tasks:', error);
-                tasksContainer.innerHTML = `
-                    <div class="error">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--accent); margin-bottom: 20px;"></i>
-                        <h3>Error Loading Tasks</h3>
-                        <p>Please try again later or contact support.</p>
-                    </div>
-                `;
-            }
-        }
-
-        // Determine organizer type from URL
-        function getOrganizerFromURL() {
-            const path = window.location.pathname;
-            if (path.includes('Tasks_Community')) return 'Community';
-            if (path.includes('Tasks_Group')) return 'Group';
-            if (path.includes('Tasks_IMS')) return 'IMS';
-            return 'Community'; // Default to Community
-        }
-
-        // Render tasks to the page
-        function renderTasks(tasks) {
-            if (tasks.length === 0) {
-                tasksContainer.innerHTML = `
-                    <div class="no-tasks">
-                        <i class="fas fa-clipboard-list" style="font-size: 3rem; color: var(--secondary); margin-bottom: 20px;"></i>
-                        <h3>No Tasks Found</h3>
-                        <p>There are currently no tasks for this category.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            tasksContainer.innerHTML = '';
-            
-            tasks.forEach(task => {
-                // Normalize status text
-                const status = task.Status.toLowerCase().includes('comming') ? 
-                    'Comming Soon' : task.Status;
-                
-                // Create task card
-                const taskCard = document.createElement('div');
-                taskCard.className = 'task-card';
-                taskCard.dataset.status = status.toLowerCase().replace(' ', '-');
-                
-                taskCard.innerHTML = `
-                    <img src="${task['Thumbnail?'] || 'https://via.placeholder.com/300x200?text=IMS+Task'}" 
-                         alt="${task['Name of the Task?']}" class="task-img">
-                    <div class="task-content">
-                        <h3 class="task-title">${task['Name of the Task?']}</h3>
-                        <div class="task-meta">
-                            <span class="task-organizer">${task['Who is this task organized by?']}</span>
-                            <span class="task-status ${getStatusClass(status)}">${status}</span>
-                        </div>
-                    </div>
-                `;
-                
-                // Add click event to open modal
-                taskCard.addEventListener('click', () => openTaskModal(task));
-                
-                tasksContainer.appendChild(taskCard);
-            });
-        }
-
-        // Get CSS class for status
-        function getStatusClass(status) {
-            status = status.toLowerCase();
-            if (status.includes('active')) return 'status-active';
-            if (status.includes('complete')) return 'status-completed';
-            if (status.includes('comming') || status.includes('coming')) return 'status-comming-soon';
-            return '';
-        }
-
-        // Open task modal with details
-        function openTaskModal(task) {
-            // Normalize status text
-            const status = task.Status.toLowerCase().includes('comming') ? 
-                'Comming Soon' : task.Status;
-            
-            // Set modal content
-            document.getElementById('modalTitle').textContent = task['Name of the Task?'];
-            document.getElementById('modalImg').src = task['Thumbnail?'] || 'https://via.placeholder.com/800x400?text=IMS+Task';
-            document.getElementById('modalOrganizer').textContent = task['Who is this task organized by?'];
-            document.getElementById('modalStatus').textContent = status;
-            document.getElementById('modalStatus').className = `modal-status ${getStatusClass(status)}`;
-            document.getElementById('modalProblem').textContent = task['Problem Statement?'] || 'No problem statement provided.';
-            document.getElementById('modalPurpose').textContent = task['Purpose / Goal of the Task?'] || 'No purpose/goal provided.';
-            document.getElementById('modalObjectives').textContent = task.Objectives || 'No objectives provided.';
-            document.getElementById('modalOutcomes').textContent = task['Expected or Achieved Outcomes?'] || 'No outcomes provided.';
-            document.getElementById('modalDescription').textContent = task["Task's Description"] || 'No description provided.';
-            document.getElementById('modalSchedule').textContent = task['Scheduled Task Timing '] || 'No schedule provided.';
-            document.getElementById('modalPlatforms').textContent = task['Platform Names & Join links'] || 'No platforms/links provided.';
-            
-            // Render team members
-            const modalTeam = document.getElementById('modalTeam');
-            modalTeam.innerHTML = '';
-            
-            // Add team members from different roles
-            const teamRoles = [
-                { title: 'Research Team', members: task['List the Research Team Members'] },
-                { title: 'Presentation Design', members: task['List the Presentation Design Team Members'] },
-                { title: 'Presenting Team', members: task['List the Presenting Team Members'] },
-                { title: 'Media Team', members: task['List the Media Team Members'] },
-                { title: 'Coordinating Team', members: task['List the Coordinating Team Members'] }
-            ];
-            
-            teamRoles.forEach(role => {
-                if (role.members) {
-                    const members = role.members.split('\n\n').filter(m => m.trim() !== '');
-                    members.forEach(member => {
-                        const memberEl = document.createElement('div');
-                        memberEl.className = 'team-member';
-                        memberEl.innerHTML = `
-                            <span>${member.trim()}</span>
-                            <div class="team-role">${role.title}</div>
-                        `;
-                        modalTeam.appendChild(memberEl);
-                    });
-                }
-            });
-            
-            // Show modal
-            taskModal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Close modal
-        closeModal.addEventListener('click', () => {
-            taskModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        });
-
-        // Close modal when clicking outside content
-        window.addEventListener('click', (e) => {
-            if (e.target === taskModal) {
-                taskModal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }
-        });
-
-        // Hamburger menu functionality
-        const hamburger = document.getElementById('hamburger');
-        const navButtons = document.getElementById('navButtons');
-        
-        hamburger.addEventListener('click', () => {
-            navButtons.classList.toggle('active');
-            const icon = hamburger.querySelector('i');
-            if (navButtons.classList.contains('active')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-times');
-            } else {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            }
-        });
-        
-        // Floating button functionality
-        const floatingNavBtn = document.getElementById('floatingNavBtn');
-        
-        floatingNavBtn.addEventListener('click', function() {
-            navButtons.classList.toggle('active');
-            const icon = hamburger.querySelector('i');
-            if (navButtons.classList.contains('active')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-times');
-            } else {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            }
-        });
-        
-        // Show floating button on scroll
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 300) {
-                floatingNavBtn.classList.add('active');
-            } else {
-                floatingNavBtn.classList.remove('active');
-            }
-        });
-
-        // Initialize
-        fetchTasks();
-    </script>
+    modalClose.onclick = () => modal.style.display = 'none';
+    window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+  </script>
 </body>
 </html>
