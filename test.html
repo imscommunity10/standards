@@ -1,27 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Circular Image</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: #f0f0f0;
-        }
-        .circular-image {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            object-fit: cover;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Task Thumbnails</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      height: 100vh;
+      margin: 0;
+      background: #f5f5f5;
+    }
+    .circular-image {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border: 4px solid white;
+      transition: transform 0.3s ease;
+    }
+    .circular-image:hover {
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 <body>
-    <img class="circular-image" src="https://lh3.googleusercontent.com/d/1Nri3BLkATpTxOLuDEp0YMUzStf072Qyb=s200" alt="Circular Image">
+  <script>
+    const API_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLixvOERUhRjLHITAb45Sw7tCN1YDK3SI1X4sjFQus-8I1OwEZBu0bZsSewBHLHzFxYl20eC0r4hcNvmtRruHe7ECVbvUPHd6eWay1NE8qifzDpccwaPDNsJwgPsfEl3po3C7iF8lDW8_vxDQh1ghIRxOL5L6Dp-DtJPdVKM8fDYcnsyP0FFwWb_R-tNYVmBlA4hVAdbxlz1Tw1wWqSUBn_uJbQjIDfvT2neZwkcOcr4ixXnQbrQQW1zmkKA3wZACGXbbJuKybwZR4Ufur9WInyP_ZvO9w&lib=M8aPa8hsGYk5N72Vlek1ofpz1wr5Ew8Dp";
+
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(task => {
+          const img = document.createElement('img');
+          img.src = task.PreviewLink;
+          img.alt = task['Name of the Task?'];
+          img.className = 'circular-image';
+          document.body.appendChild(img);
+        });
+      })
+      .catch(err => {
+        document.body.innerHTML = '<p>Failed to load images.</p>';
+        console.error(err);
+      });
+  </script>
 </body>
 </html>
