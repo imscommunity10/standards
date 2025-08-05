@@ -502,11 +502,11 @@
             margin: 50px 0;
         }
 
-	@media (max-width: 768px) {
-		.tasks-container {
-        		grid-template-columns: 1fr;
-    		}
-	}
+        @media (max-width: 768px) {
+            .tasks-container {
+                grid-template-columns: 1fr;
+            }
+        }
 
         .task-card {
             background: var(--card);
@@ -1309,16 +1309,31 @@
             return buttons;
         };
         
-        // Improved image error handling
-        const handleImageError = (imgElement, taskName) => {
-            imgElement.onerror = null;
-            imgElement.src = '';
-            imgElement.outerHTML = `
-                    <div class="placeholder-img">
-                        <i class="fas fa-image"></i>
-                        <p>Image unavailable</p>
-                    </div>
-            `;
+        // Extract file ID from Google Drive URL
+        const extractFileId = (url) => {
+            if (!url) return null;
+            
+            // Handle direct link format: https://drive.google.com/uc?export=view&id=FILE_ID
+            const match1 = url.match(/[?&]id=([^&]+)/);
+            if (match1) return match1[1];
+            
+            // Handle open link format: https://drive.google.com/open?id=FILE_ID
+            const match2 = url.match(/[?&]id=([^&]+)/);
+            if (match2) return match2[1];
+            
+            // Handle file/d/ format: https://drive.google.com/file/d/FILE_ID/view
+            const match3 = url.match(/\/file\/d\/([^/]+)/);
+            if (match3) return match3[1];
+            
+            return null;
+        };
+        
+        // Generate direct image URL from Google Drive
+        const generateDriveImageUrl = (url) => {
+            const fileId = extractFileId(url);
+            if (!fileId) return '';
+            
+            return `https://drive.google.com/uc?id=${fileId}`;
         };
         
         // Fetch and display tasks
@@ -1369,7 +1384,7 @@
                 taskCard.className = 'task-card';
                 taskCard.dataset.status = task['Status'].toLowerCase().replace('comming soon', 'coming soon');
                 
-                const previewLink = task['PreviewLink'] || '';
+                const previewLink = generateDriveImageUrl(task['PreviewLink']) || '';
                 const taskName = task['Name of the Task?'] || 'Untitled Task';
                 
                 taskCard.innerHTML = `
@@ -1377,7 +1392,7 @@
                         <img src="${previewLink}" 
                              alt="${taskName}" 
                              class="task-thumbnail"
-                             onerror="handleImageError(this, '${taskName.replace(/'/g, "\\'")}')">
+                             onerror="this.onerror=null; this.src=''; this.outerHTML='<div class=\'placeholder-img\'><i class=\'fas fa-image\'></i><p>Image unavailable</p></div>';">
                     </div>
                     <div class="task-content">
                         <h3 class="task-title">${taskName}</h3>
@@ -1415,7 +1430,8 @@
             
             // Set image
             const modalImg = document.getElementById('modalImg');
-            modalImg.src = task['PreviewLink'] || '';
+            const previewLink = generateDriveImageUrl(task['PreviewLink']) || '';
+            modalImg.src = previewLink;
             modalImg.alt = task['Name of the Task?'] || 'Task Thumbnail';
             
             // Handle image error in modal
@@ -1511,18 +1527,5 @@
             }
         });
     </script>
-
-
-
-
-<script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbzY6e5j.../exec"; // <-- use your actual Apps Script URL
-
-  document.addEventListener("DOMContentLoaded", () => {
-    fetchTasks(); // Ensures DOM is ready before running
-  });
-</script>
-
-	
 </body>
 </html>
