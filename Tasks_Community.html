@@ -1362,87 +1362,89 @@
             }
         };
         
-        // Display tasks in the container with filtering
-        const displayTasks = (tasks) => {
-            if (tasks.length === 0) {
-                tasksContainer.innerHTML = `
-                    <div class="loader">
-                        <i class="fas fa-inbox" style="font-size: 3rem; color: var(--secondary);"></i>
-                        <div class="loading-text">No tasks available at the moment</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            tasksContainer.innerHTML = '';
-            
-            tasks.forEach(task => {
-                const taskCard = document.createElement('div');
-                taskCard.className = 'task-card';
-                taskCard.dataset.status = task['Status'].toLowerCase().replace('comming soon', 'coming soon');
-                
-                // Use PreviewLink directly without conversion
-                const previewLink = task['PreviewLink'] || '';
-                const taskName = task['Name of the Task?'] || 'Untitled Task';
-                
-                taskCard.innerHTML = `
-                    <div class="task-thumbnail-container">
-                        <img src="${previewLink}" 
-                             alt="${taskName}" 
-                             class="task-thumbnail"
-                             onerror="this.onerror=null; this.outerHTML='<div class=\\'placeholder-img\\'><i class=\\'fas fa-image\\'></i><p>Image unavailable</p></div>';">
-                    </div>
-                    <div class="task-content">
-                        <h3 class="task-title">${taskName}</h3>
-                        <div class="task-status ${getStatusClass(task['Status'])}">${task['Status']}</div>
-                    </div>
-                `;
-                
-                taskCard.addEventListener('click', () => {
-                    showTaskDetails(task);
-                });
-                
-                tasksContainer.appendChild(taskCard);
-            });
-        };
-        
-        // Filter tasks by status
-        const filterTasksByStatus = (status) => {
-            const filteredTasks = allTasks.filter(task => {
-                const taskStatus = task['Status'].toLowerCase().replace('comming soon', 'coming soon');
-                return status === 'all' || taskStatus === status;
-            });
-            
-            // Filter by page type
-            const filterType = getPageType();
-            const pageFilteredTasks = filteredTasks.filter(item => 
-                item['Who is this task organized by?']?.toLowerCase() === filterType?.toLowerCase()
-            );
-            
-            displayTasks(pageFilteredTasks);
-        };
-        
-        // Show task details in modal
-        const showTaskDetails = (task) => {
-            document.getElementById('modalTitle').textContent = task['Name of the Task?'] || 'Untitled Task';
-            
-            // Set image - use PreviewLink directly
-            const modalImg = document.getElementById('modalImg');
-            const previewLink = task['PreviewLink'] || '';
-            modalImg.src = previewLink;
-            modalImg.alt = task['Name of the Task?'] || 'Task Thumbnail';
-            
-            // Handle image error in modal
-            modalImg.onerror = function() {
-                this.onerror = null;
-                this.src = '';
-                this.parentElement.innerHTML = `
-                    <div class="placeholder-img">
-                        <i class="fas fa-image"></i>
-                        <p>Image unavailable</p>
-                    </div>
-                `;
-            };
+// Display tasks in the container with filtering
+const displayTasks = (tasks) => {
+    if (tasks.length === 0) {
+        tasksContainer.innerHTML = `
+            <div class="loader">
+                <i class="fas fa-inbox" style="font-size: 3rem; color: var(--secondary);"></i>
+                <div class="loading-text">No tasks available at the moment</div>
+            </div>
+        `;
+        return;
+    }
+
+    tasksContainer.innerHTML = '';
+
+    tasks.forEach(task => {
+        const taskCard = document.createElement('div');
+        taskCard.className = 'task-card';
+        taskCard.dataset.status = task['Status'].toLowerCase().replace('comming soon', 'coming soon');
+
+        // ✅ Use PreviewLink directly for image
+        const previewLink = task['PreviewLink'] || '';
+        const taskName = task['Name of the Task?'] || 'Untitled Task';
+
+        taskCard.innerHTML = `
+            <div class="task-thumbnail-container">
+                <img src="${previewLink}" 
+                     alt="${taskName}" 
+                     class="task-thumbnail"
+                     onerror="this.onerror=null; this.outerHTML='<div class=\\'placeholder-img\\'><i class=\\'fas fa-image\\'></i><p>Image unavailable</p></div>';">
+            </div>
+            <div class="task-content">
+                <h3 class="task-title">${taskName}</h3>
+                <div class="task-status ${getStatusClass(task['Status'])}">${task['Status']}</div>
+            </div>
+        `;
+
+        taskCard.addEventListener('click', () => {
+            showTaskDetails(task);
+        });
+
+        tasksContainer.appendChild(taskCard);
+    });
+};
+
+// Filter tasks by status and role (Community, Group, IMS)
+const filterTasksByStatus = (status) => {
+    const filteredTasks = allTasks.filter(task => {
+        const taskStatus = task['Status'].toLowerCase().replace('comming soon', 'coming soon');
+        return status === 'all' || taskStatus === status;
+    });
+
+    // Filter by page type (e.g., "Community", "Group", "IMS")
+    const filterType = getPageType();
+    const pageFilteredTasks = filteredTasks.filter(item => 
+        item['Who is this task organized by?']?.toLowerCase() === filterType?.toLowerCase()
+    );
+
+    displayTasks(pageFilteredTasks);
+};
+
+// Show full task details in a modal
+const showTaskDetails = (task) => {
+    document.getElementById('modalTitle').textContent = task['Name of the Task?'] || 'Untitled Task';
+
+    const modalImg = document.getElementById('modalImg');
+    const previewLink = task['PreviewLink'] || '';
+    modalImg.src = previewLink;
+    modalImg.alt = task['Name of the Task?'] || 'Task Thumbnail';
+
+    // Handle error if modal image can't load
+    modalImg.onerror = function () {
+        this.onerror = null;
+        this.src = '';
+        this.parentElement.innerHTML = `
+            <div class="placeholder-img">
+                <i class="fas fa-image"></i>
+                <p>Image unavailable</p>
+            </div>
+        `;
+    };
+
+    // Populate other modal fields as needed (not included here)
+
             
             // Set status
             document.getElementById('modalStatus').textContent = task['Status'] || 'Unknown Status';
