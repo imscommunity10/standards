@@ -519,9 +519,19 @@
             box-shadow: 0 15px 40px var(--shadow);
         }
 
-        .task-thumbnail {
-            height: 200px;
+        .task-thumbnail-container {
+            position: relative;
             width: 100%;
+            padding-top: 100%; /* 1:1 Aspect Ratio */
+            overflow: hidden;
+        }
+
+        .task-thumbnail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             border-bottom: 3px solid var(--accent);
         }
@@ -618,13 +628,23 @@
             transform: rotate(90deg);
         }
 
-        .modal-img {
+        .modal-img-container {
             width: 100%;
-            height: 300px;
-            object-fit: cover;
+            height: 350px;
+            overflow: hidden;
             border-radius: 10px;
             margin-bottom: 25px;
             border: 1px solid var(--divider);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.05);
+        }
+
+        .modal-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .modal-title {
@@ -658,6 +678,7 @@
 
         .modal-section p {
             line-height: 1.7;
+            white-space: pre-wrap;
         }
 
         .team-grid {
@@ -690,6 +711,36 @@
             margin-bottom: 5px;
         }
 
+        .platform-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .platform-btn {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 6px;
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid var(--secondary);
+        }
+
+        .platform-btn:hover {
+            background: var(--secondary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .platform-btn i {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
         /* Loading Animation */
         .loader {
             display: flex;
@@ -718,6 +769,30 @@
             font-size: 1.2rem;
             color: var(--text);
             font-weight: 500;
+        }
+
+        /* Status Tabs */
+        .status-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .status-tab {
+            padding: 10px 20px;
+            border-radius: 30px;
+            background: rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--divider);
+        }
+
+        .status-tab.active {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
         }
 
         /* Responsive Design */
@@ -833,8 +908,8 @@
                 padding: 20px;
             }
 
-            .modal-img {
-                height: 200px;
+            .modal-img-container {
+                height: 250px;
             }
         }
 
@@ -861,6 +936,10 @@
 
             .modal-title {
                 font-size: 1.8rem;
+            }
+
+            .modal-img-container {
+                height: 200px;
             }
         }
 
@@ -1000,9 +1079,17 @@
             </div>
         </header>
 
+        <!-- Status Filter Tabs -->
+        <div class="status-tabs" id="statusTabs">
+            <div class="status-tab active" data-status="all">All Tasks</div>
+            <div class="status-tab" data-status="active">Active</div>
+            <div class="status-tab" data-status="completed">Completed</div>
+            <div class="status-tab" data-status="coming soon">Coming Soon</div>
+        </div>
+
         <!-- Tasks Display Section -->
         <section>
-            <h2 class="section-title">Active Tasks</h2>
+            <h2 class="section-title">All Tasks</h2>
             <div class="tasks-container" id="tasksContainer">
                 <div class="loader">
                     <div class="spinner"></div>
@@ -1016,7 +1103,9 @@
     <div class="modal" id="taskModal">
         <div class="modal-content">
             <button class="modal-close" id="modalClose">&times;</button>
-            <img class="modal-img" id="modalImg" src="" alt="Task Thumbnail">
+            <div class="modal-img-container">
+                <img class="modal-img" id="modalImg" src="" alt="Task Thumbnail">
+            </div>
             <h2 class="modal-title" id="modalTitle"></h2>
             <div class="task-status" id="modalStatus"></div>
             
@@ -1052,7 +1141,7 @@
             
             <div class="modal-section">
                 <h3>Platforms & Links</h3>
-                <p id="modalPlatforms"></p>
+                <div class="platform-buttons" id="modalPlatforms"></div>
             </div>
             
             <div class="modal-section">
@@ -1127,6 +1216,8 @@
         const tasksContainer = document.getElementById('tasksContainer');
         const taskModal = document.getElementById('taskModal');
         const modalClose = document.getElementById('modalClose');
+        const statusTabs = document.getElementById('statusTabs');
+        let allTasks = [];
         
         // Get current page type
         const getPageType = () => {
@@ -1148,6 +1239,7 @@
             
             if (pageType && titleMap[pageType]) {
                 document.getElementById('page-title').textContent = titleMap[pageType];
+                document.querySelector('.section-title').textContent = titleMap[pageType];
             }
         };
         
@@ -1163,7 +1255,50 @@
         
         // Format text with line breaks
         const formatText = (text) => {
-            return text.replace(/\n/g, '<br>');
+            return text ? text.replace(/\n/g, '<br>') : 'N/A';
+        };
+        
+        // Create platform buttons with icons
+        const createPlatformButtons = (platformsText) => {
+            if (!platformsText) return '';
+            
+            const links = platformsText.split('\n').filter(link => link.trim() !== '');
+            if (links.length === 0) return '<p>No links available</p>';
+            
+            let buttons = '';
+            
+            links.forEach(link => {
+                let icon = 'fa-link';
+                let platform = 'Link';
+                
+                if (link.includes('youtube.com') || link.includes('youtu.be')) {
+                    icon = 'fa-youtube';
+                    platform = 'YouTube';
+                } else if (link.includes('twitter.com')) {
+                    icon = 'fa-twitter';
+                    platform = 'Twitter';
+                } else if (link.includes('drive.google.com')) {
+                    icon = 'fa-google-drive';
+                    platform = 'Google Drive';
+                } else if (link.includes('docs.google.com')) {
+                    icon = 'fa-google';
+                    platform = 'Google Docs';
+                } else if (link.includes('zoom.us')) {
+                    icon = 'fa-video';
+                    platform = 'Zoom';
+                } else if (link.includes('facebook.com')) {
+                    icon = 'fa-facebook';
+                    platform = 'Facebook';
+                }
+                
+                buttons += `
+                    <a href="${link}" target="_blank" class="platform-btn">
+                        <i class="fab ${icon}"></i> ${platform}
+                    </a>
+                `;
+            });
+            
+            return buttons;
         };
         
         // Fetch and display tasks
@@ -1171,6 +1306,7 @@
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
+                allTasks = data;
                 
                 // Filter tasks based on page type
                 const filterType = getPageType();
@@ -1194,7 +1330,7 @@
             }
         };
         
-        // Display tasks in the container
+        // Display tasks in the container with filtering
         const displayTasks = (tasks) => {
             if (tasks.length === 0) {
                 tasksContainer.innerHTML = `
@@ -1211,9 +1347,15 @@
             tasks.forEach(task => {
                 const taskCard = document.createElement('div');
                 taskCard.className = 'task-card';
+                taskCard.dataset.status = task['Status'].toLowerCase().replace('comming soon', 'coming soon');
+                
                 taskCard.innerHTML = `
-                    <img src="${task['PreviewLink'] || 'https://via.placeholder.com/600x400?text=No+Preview'}" 
-                         alt="${task['Name of the Task?']}" class="task-thumbnail">
+                    <div class="task-thumbnail-container">
+                        <img src="${task['PreviewLink']}" 
+                             alt="${task['Name of the Task?']}" 
+                             class="task-thumbnail"
+                             onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23f0f0f0\'/><text x=\'50\' y=\'50\' font-family=\'Arial\' font-size=\'10\' text-anchor=\'middle\' fill=\'%23000\'>No Preview</text></svg>'">
+                    </div>
                     <div class="task-content">
                         <h3 class="task-title">${task['Name of the Task?']}</h3>
                         <div class="task-status ${getStatusClass(task['Status'])}">${task['Status']}</div>
@@ -1228,47 +1370,79 @@
             });
         };
         
+        // Filter tasks by status
+        const filterTasksByStatus = (status) => {
+            const filteredTasks = allTasks.filter(task => {
+                const taskStatus = task['Status'].toLowerCase().replace('comming soon', 'coming soon');
+                return status === 'all' || taskStatus === status;
+            });
+            
+            // Filter by page type
+            const filterType = getPageType();
+            const pageFilteredTasks = filteredTasks.filter(item => 
+                item['Who is this task organized by?']?.toLowerCase() === filterType?.toLowerCase()
+            );
+            
+            displayTasks(pageFilteredTasks);
+        };
+        
         // Show task details in modal
         const showTaskDetails = (task) => {
-            document.getElementById('modalTitle').textContent = task['Name of the Task?'];
-            document.getElementById('modalImg').src = task['PreviewLink'] || 'https://via.placeholder.com/800x400?text=No+Preview';
-            document.getElementById('modalStatus').textContent = task['Status'];
+            document.getElementById('modalTitle').textContent = task['Name of the Task?'] || 'Untitled Task';
+            
+            // Set image
+            const modalImg = document.getElementById('modalImg');
+            modalImg.src = task['PreviewLink'] || '';
+            modalImg.alt = task['Name of the Task?'] || 'Task Thumbnail';
+            
+            // Set status
+            document.getElementById('modalStatus').textContent = task['Status'] || 'Unknown Status';
             document.getElementById('modalStatus').className = `task-status ${getStatusClass(task['Status'])}`;
             
-            document.getElementById('modalProblem').innerHTML = formatText(task['Problem Statement?'] || 'N/A');
-            document.getElementById('modalPurpose').innerHTML = formatText(task['Purpose / Goal of the Task?'] || 'N/A');
-            document.getElementById('modalObjectives').innerHTML = formatText(task['Objectives'] || 'N/A');
-            document.getElementById('modalOutcomes').innerHTML = formatText(task['Expected or Achieved Outcomes?'] || 'N/A');
-            document.getElementById('modalDescription').innerHTML = formatText(task["Task's Description"] || 'N/A');
-            document.getElementById('modalSchedule').innerHTML = formatText(task['Scheduled Task Timing '] || 'N/A');
-            document.getElementById('modalPlatforms').innerHTML = formatText(task['Platform Names & Join links'] || 'N/A');
+            // Set content
+            document.getElementById('modalProblem').innerHTML = formatText(task['Problem Statement?'] || 'No problem statement available');
+            document.getElementById('modalPurpose').innerHTML = formatText(task['Purpose / Goal of the Task?'] || 'No purpose/goal defined');
+            document.getElementById('modalObjectives').innerHTML = formatText(task['Objectives'] || 'No objectives defined');
+            document.getElementById('modalOutcomes').innerHTML = formatText(task['Expected or Achieved Outcomes?'] || 'No outcomes defined');
+            document.getElementById('modalDescription').innerHTML = formatText(task["Task's Description"] || 'No description available');
+            document.getElementById('modalSchedule').innerHTML = formatText(task['Scheduled Task Timing '] || 'No schedule defined');
+            
+            // Set platform buttons
+            document.getElementById('modalPlatforms').innerHTML = createPlatformButtons(task['Platform Names & Join links'] || '');
             
             // Display team members
             const teamsContainer = document.getElementById('modalTeams');
             teamsContainer.innerHTML = '';
             
             const teamTypes = [
-                'Research Team Members',
-                'Presentation Design Team Members',
-                'Presenting Team Members',
-                'Media Team Members',
-                'Coordinating Team Members'
+                'List the Research Team Members',
+                'List the Presentation Design Team Members',
+                'List the Presenting Team Members',
+                'List the Media Team Members',
+                'List the Coordinating Team Members'
             ];
             
             teamTypes.forEach(teamType => {
                 if (task[teamType]) {
-                    const teamCard = document.createElement('div');
-                    teamCard.className = 'team-card';
-                    teamCard.innerHTML = `
-                        <h4>${teamType.replace('List the ', '')}</h4>
-                        <ul>
-                            ${task[teamType].split('\n\n').map(member => `<li>${member}</li>`).join('')}
-                        </ul>
-                    `;
-                    teamsContainer.appendChild(teamCard);
+                    const members = task[teamType].split('\n').filter(m => m.trim() !== '');
+                    if (members.length > 0) {
+                        const teamCard = document.createElement('div');
+                        teamCard.className = 'team-card';
+                        
+                        const teamTitle = teamType.replace('List the ', '').replace('Team Members', 'Team');
+                        
+                        teamCard.innerHTML = `
+                            <h4>${teamTitle}</h4>
+                            <ul>
+                                ${members.map(member => `<li>${member}</li>`).join('')}
+                            </ul>
+                        `;
+                        teamsContainer.appendChild(teamCard);
+                    }
                 }
             });
             
+            // Show modal
             taskModal.style.display = 'flex';
         };
         
@@ -1286,6 +1460,21 @@
         
         // Initialize
         fetchTasks();
+        
+        // Status tab functionality
+        statusTabs.addEventListener('click', (e) => {
+            if (e.target.classList.contains('status-tab')) {
+                // Update active tab
+                document.querySelectorAll('.status-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                
+                // Filter tasks
+                const status = e.target.dataset.status;
+                filterTasksByStatus(status);
+            }
+        });
     </script>
 </body>
 </html>
