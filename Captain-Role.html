@@ -494,6 +494,41 @@
             font-size: 0.9rem;
         }
 
+        /* Add this CSS to make the button stand out */
+        .official-sites-btn {
+            background: linear-gradient(90deg, #ffd700 0%, #ff00c8 100%);
+            color: #fff !important;
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 20px #ffd70088, 0 4px 12px #ff00c888;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 8px #ff00c8aa;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+        }
+        .official-sites-btn:hover {
+            background: linear-gradient(90deg, #ff00c8 0%, #ffd700 100%);
+            color: #fff;
+            box-shadow: 0 0 30px #ffd700cc, 0 8px 24px #ff00c8cc;
+            transform: scale(1.08) rotate(-2deg);
+        }
+        .official-sites-btn i {
+            margin-right: 10px;
+            font-size: 1.2em;
+            filter: drop-shadow(0 0 4px #ffd700);
+        }
+
+        /* Responsive tweaks for mobile */
+        @media (max-width: 768px) {
+            .official-sites-btn {
+                width: 100%;
+                font-size: 1.1rem;
+                padding: 14px 18px;
+                margin-bottom: 8px;
+            }
+        }
+
         /* Responsive Design */
         @media (max-width: 992px) {
             h1 {
@@ -732,6 +767,24 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Visit Official Sites Dropdown -->
+            <div class="dropdown" id="officialSitesDropdown">
+                <button class="nav-btn official-sites-btn dropdown-btn">
+                    <i class="fas fa-globe"></i> Visit Official Sites
+                </button>
+                <div class="dropdown-content">
+                    <a href="https://islamicmessagingsystem.com/" target="_blank">
+                        <i class="fas fa-home"></i> Website
+                    </a>
+                    <a href="https://islamicmessagingsystem.com/register/" target="_blank">
+                        <i class="fas fa-user-plus"></i> Registration
+                    </a>
+                    <a href="https://www.youtube.com/@IMSPRODUCTIONSOFFICIAL" target="_blank">
+                        <i class="fab fa-youtube"></i> YouTube Channel
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </nav>
@@ -962,9 +1015,17 @@
         
         // Mobile dropdown functionality
         const rolesDropdown = document.getElementById('rolesDropdown');
+        const officialSitesDropdown = document.getElementById('officialSitesDropdown');
         
         // For mobile: toggle dropdown on click
         rolesDropdown.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                e.preventDefault();
+                this.classList.toggle('active');
+            }
+        });
+        
+        officialSitesDropdown.addEventListener('click', function(e) {
             if (window.innerWidth <= 768) {
                 e.preventDefault();
                 this.classList.toggle('active');
@@ -977,6 +1038,10 @@
             
             if (!rolesDropdown.contains(e.target)) {
                 rolesDropdown.classList.remove('active');
+            }
+            
+            if (!officialSitesDropdown.contains(e.target)) {
+                officialSitesDropdown.classList.remove('active');
             }
         });
         
