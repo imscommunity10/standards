@@ -803,23 +803,6 @@
             border-color: var(--secondary);
         }
 
-        /* Circular Image Thumbnails */
-        .circular-image {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            border: 4px solid white;
-            transition: transform 0.3s ease;
-            display: inline-block;
-        }
-
-        .circular-image:hover {
-            transform: scale(1.05);
-        }
-
         /* Responsive Design */
         @media (max-width: 992px) {
             h1 {
@@ -1031,22 +1014,6 @@
         .neon-theme .task-card:hover {
             box-shadow: 0 0 25px rgba(0, 243, 255, 0.2), 0 15px 40px var(--shadow);
         }
-
-        /* Circular Image Styles */
-        .circular-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 10px;
-            border: 2px solid var(--accent);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Hide original images */
-        .task-thumbnail {
-            display: none;
-        }
     </style>
 </head>
 <body class="light-theme">
@@ -1118,8 +1085,6 @@
                 <button class="theme-btn dark-btn" title="Dark Theme"><i class="fas fa-moon"></i></button>
                 <button class="theme-btn neon-btn" title="Neon Theme"><i class="fas fa-bolt"></i></button>
             </div>
-            <!-- Circular Thumbnails Section -->
-            <div id="thumbnailContainer" style="text-align:center; margin-top:30px; margin-bottom:10px;"></div>
         </header>
 
         <!-- Status Filter Tabs -->
@@ -1140,9 +1105,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- Thumbnails Container for Circular Display -->
-        <div id="thumbnailContainer" style="display: none; margin-bottom: 30px;"></div>
     </div>
 
     <!-- Task Detail Modal -->
@@ -1256,6 +1218,97 @@
             }
         });
 
+        // Task Display Functionality
+        const API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjWBMOs8uUG-0lF5zsC7gEwL_2rmU5ClfDdetELXRhOAKvs06wYf4il25dMDgREJARX3jK08YADpthOIWiDujOmKfk_scPUDX7jfxJCRgnjflG7C7dRDMsoqSFAwax1ypU5yXz5Aca7CZ3euDOmMyU1kC0hd6-DFblEPsNszJ6ymoh8DXgdfBKD3huKBqSyd9C3aqyLlHr6aqlAuqnOX10Q3KkcXiohHeirrfbe4DcjsRwby8i1ELWmMzxrOnzRKH7tTkifIbsZ3Lb41nHGH3PW_VKKkg&lib=M8aPa8hsGYk5N72Vlek1ofpz1wr5Ew8Dp';
+        
+        const tasksContainer = document.getElementById('tasksContainer');
+        const taskModal = document.getElementById('taskModal');
+        const modalClose = document.getElementById('modalClose');
+        const statusTabs = document.getElementById('statusTabs');
+        let allTasks = [];
+        
+        // Get current page type
+        const getPageType = () => {
+            const path = window.location.pathname.toLowerCase();
+            if (path.includes('tasks_community')) return 'Community';
+            if (path.includes('tasks_group')) return 'Group';
+            if (path.includes('tasks_ims')) return 'IMS';
+            return null;
+        };
+        
+        // Set page title based on page type
+        const setPageTitle = () => {
+            const pageType = getPageType();
+            const titleMap = {
+                'Community': 'Community Tasks',
+                'Group': 'Group Tasks',
+                'IMS': 'IMS Tasks'
+            };
+            
+            if (pageType && titleMap[pageType]) {
+                document.getElementById('page-title').textContent = titleMap[pageType];
+                document.querySelector('.section-title').textContent = titleMap[pageType];
+            }
+        };
+        
+        // Get status class for styling
+        const getStatusClass = (status) => {
+            switch (status.toLowerCase()) {
+                case 'active': return 'status-active';
+                case 'completed': return 'status-completed';
+                case 'coming soon': return 'status-coming-soon';
+                default: return '';
+            }
+        };
+        
+        // Format text with line breaks
+        const formatText = (text) => {
+            return text ? text.replace(/\n/g, '<br>') : 'N/A';
+        };
+        
+        // Create platform buttons with icons
+        const createPlatformButtons = (platformsText) => {
+            if (!platformsText) return '';
+            
+            const links = platformsText.split('\n').filter(link => link.trim() !== '');
+            if (links.length === 0) return '<p>No links available</p>';
+            
+            let buttons = '';
+            
+            links.forEach(link => {
+                let icon = 'fa-link';
+                let platform = 'Link';
+                
+                if (link.includes('youtube.com') || link.includes('youtu.be')) {
+                    icon = 'fa-youtube';
+                    platform = 'YouTube';
+                } else if (link.includes('twitter.com')) {
+                    icon = 'fa-twitter';
+                    platform = 'Twitter';
+                } else if (link.includes('drive.google.com')) {
+                    icon = 'fa-google-drive';
+                    platform = 'Google Drive';
+                } else if (link.includes('docs.google.com')) {
+                    icon = 'fa-google';
+                    platform = 'Google Docs';
+                } else if (link.includes('zoom.us')) {
+                    icon = 'fa-video';
+                    platform = 'Zoom';
+                } else if (link.includes('facebook.com')) {
+                    icon = 'fa-facebook';
+                    platform = 'Facebook';
+                }
+                
+                buttons += `
+                    <a href="${link}" target="_blank" class="platform-btn">
+                        <i class="fab ${icon}"></i> ${platform}
+                    </a>
+                `;
+            });
+            
+            return buttons;
+        };
+        
         // Improved image error handling
         const handleImageError = (imgElement, taskName) => {
             imgElement.onerror = null;
@@ -1267,41 +1320,23 @@
                     </div>
             `;
         };
-
-        // Circular Thumbnails Display
-        function displayCircularThumbnails(tasks) {
-            const thumbnailContainer = document.getElementById('thumbnailContainer');
-            if (!thumbnailContainer) return;
-            thumbnailContainer.innerHTML = '';
-            tasks.forEach(task => {
-                if (task['PreviewLink']) {
-                    const img = document.createElement('img');
-                    img.src = task['PreviewLink'];
-                    img.alt = task['Name of the Task?'] || 'Task';
-                    img.className = 'circular-image';
-                    img.onerror = function() {
-                        this.style.display = 'none';
-                    };
-                    thumbnailContainer.appendChild(img);
-                }
-            });
-        }
-
+        
         // Fetch and display tasks
         const fetchTasks = async () => {
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
                 allTasks = data;
+                
                 // Filter tasks based on page type
                 const filterType = getPageType();
                 const filteredTasks = data.filter(item => 
                     item['Who is this task organized by?']?.toLowerCase() === filterType?.toLowerCase()
                 );
+                
                 // Update page title
                 setPageTitle();
-                // Display circular thumbnails above tasks
-                displayCircularThumbnails(filteredTasks);
+                
                 // Display tasks
                 displayTasks(filteredTasks);
             } catch (error) {
@@ -1312,7 +1347,6 @@
                         <div class="loading-text">Failed to load tasks. Please try again later.</div>
                     </div>
                 `;
-                document.getElementById('thumbnailContainer').innerHTML = '<p>Failed to load images.</p>';
             }
         };
         
