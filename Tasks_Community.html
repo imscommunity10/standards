@@ -803,24 +803,23 @@
             border-color: var(--secondary);
         }
 
-        /* Placeholder styling */
-        .placeholder-img {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
+        /* Remove circular image style, restore original modal and thumbnail image style */
+        .task-thumbnail {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-bottom: 3px solid var(--accent);
             background: #f0f0f0;
-            color: #888;
-            font-size: 1rem;
         }
-        
-        .placeholder-img i {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            color: #ccc;
+        .modal-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
+        .placeholder-img { display: none; }
 
         /* Theme-specific styles */
         body.light-theme {
@@ -984,10 +983,6 @@
             <button class="modal-close" id="modalClose">&times;</button>
             <div class="modal-img-container">
                 <img class="modal-img" id="modalImg" src="" alt="Task Thumbnail">
-                <div class="placeholder-img" id="modalPlaceholder">
-                    <i class="fas fa-image"></i>
-                    <p>Image unavailable</p>
-                </div>
             </div>
             <h2 class="modal-title" id="modalTitle"></h2>
             <div class="task-status" id="modalStatus"></div>
@@ -1184,6 +1179,18 @@
             return buttons;
         };
         
+        // Improved image error handling
+        const handleImageError = (imgElement, taskName) => {
+            imgElement.onerror = null;
+            imgElement.src = '';
+            imgElement.outerHTML = `
+                    <div class="placeholder-img">
+                        <i class="fas fa-image"></i>
+                        <p>Image unavailable</p>
+                    </div>
+            `;
+        };
+        
         // Fetch and display tasks
         const fetchTasks = async () => {
             try {
@@ -1224,58 +1231,46 @@
                 `;
                 return;
             }
-            
             tasksContainer.innerHTML = '';
             tasks.forEach(task => {
                 const taskCard = document.createElement('div');
                 taskCard.className = 'task-card';
                 taskCard.dataset.status = task['Status']?.toLowerCase().replace('comming soon', 'coming soon') || '';
-                
                 const previewLink = task['PreviewLink'] || '';
                 const taskName = task['Name of the Task?'] || 'Untitled Task';
-                const status = task['Status'] || 'Unknown';
-                
                 taskCard.innerHTML = `
                     <div class="task-thumbnail-container">
-                        ${previewLink ? 
-                            `<img src="${previewLink}" alt="${taskName}" class="task-thumbnail">` : 
-                            `<div class="placeholder-img">
-                                <i class="fas fa-image"></i>
-                                <p>Image unavailable</p>
-                            </div>`
-                        }
+                        ${previewLink ? `<img src="${previewLink}" alt="${taskName}" class="task-thumbnail">` : `<div class=\"placeholder-img\" style=\"flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;display:flex;\"><i class=\"fas fa-image\" style=\"font-size:3rem;color:#ccc;\"></i><p>Image unavailable</p></div>`}
+                        <div class="placeholder-img" style="flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;display:none;">
+                            <i class="fas fa-image" style="font-size:3rem;color:#ccc;"></i>
+                            <p>Image unavailable</p>
+                        </div>
                     </div>
                     <div class="task-content">
                         <h3 class="task-title">${taskName}</h3>
-                        <div class="task-status ${getStatusClass(status)}">${status}</div>
+                        <div class="task-status ${getStatusClass(task['Status'])}">${task['Status']}</div>
                     </div>
                 `;
-                
+                // Add JS error/loading handlers for image
+                const imgElement = taskCard.querySelector('.task-thumbnail');
+                const placeholder = taskCard.querySelector('.placeholder-img');
+                if (imgElement) {
+                    imgElement.onerror = () => {
+                        imgElement.style.display = 'none';
+                        if (placeholder) placeholder.style.display = 'flex';
+                    };
+                    imgElement.onload = () => {
+                        imgElement.style.display = 'block';
+                        if (placeholder) placeholder.style.display = 'none';
+                    };
+                } else {
+                    if (placeholder) placeholder.style.display = 'flex';
+                }
                 taskCard.addEventListener('click', () => {
                     showTaskDetails(task);
                 });
-                
-                // Add image error handling
-                const img = taskCard.querySelector('.task-thumbnail');
-                if (img) {
-                    img.onerror = function() {
-                        this.replaceWith(createPlaceholder());
-                    };
-                }
-                
                 tasksContainer.appendChild(taskCard);
             });
-        };
-        
-        // Create placeholder element
-        const createPlaceholder = () => {
-            const placeholder = document.createElement('div');
-            placeholder.className = 'placeholder-img';
-            placeholder.innerHTML = `
-                <i class="fas fa-image"></i>
-                <p>Image unavailable</p>
-            `;
-            return placeholder;
         };
         
         // Filter tasks by status
@@ -1297,26 +1292,30 @@
         // Show task details in modal
         const showTaskDetails = (task) => {
             document.getElementById('modalTitle').textContent = task['Name of the Task?'] || 'Untitled Task';
-            
-            // Set image or placeholder
+            // Set image
             const modalImg = document.getElementById('modalImg');
-            const modalPlaceholder = document.getElementById('modalPlaceholder');
-            const previewLink = task['PreviewLink'] || '';
-            
-            if (previewLink) {
-                modalImg.src = previewLink;
-                modalImg.style.display = 'block';
-                modalPlaceholder.style.display = 'none';
-                
-                // Handle image loading errors
-                modalImg.onerror = function() {
-                    this.style.display = 'none';
-                    modalPlaceholder.style.display = 'flex';
-                };
+            if (task['PreviewLink']) {
+                modalImg.style.display = '';
+                modalImg.src = task['PreviewLink'];
+                modalImg.alt = task['Name of the Task?'] || 'Task Thumbnail';
             } else {
                 modalImg.style.display = 'none';
-                modalPlaceholder.style.display = 'flex';
             }
+            modalImg.className = 'modal-img';
+            // Hide placeholder if present
+            const placeholder = modalImg.parentElement.querySelector('.placeholder-img');
+            if (placeholder) placeholder.style.display = task['PreviewLink'] ? 'none' : 'flex';
+            // Add JS error/loading handlers for modal image
+            modalImg.onerror = function() {
+                this.onerror = null;
+                this.src = '';
+                this.style.display = 'none';
+                if (placeholder) placeholder.style.display = 'flex';
+            };
+            modalImg.onload = function() {
+                this.style.display = 'block';
+                if (placeholder) placeholder.style.display = 'none';
+            };
             
             // Set status
             document.getElementById('modalStatus').textContent = task['Status'] || 'Unknown Status';
@@ -1372,6 +1371,14 @@
         // Close modal
         modalClose.addEventListener('click', () => {
             taskModal.style.display = 'none';
+            const modalImg = document.getElementById('modalImg');
+            if (modalImg) {
+                modalImg.src = '';
+                modalImg.style.display = '';
+                modalImg.className = 'modal-img';
+            }
+            const placeholder = document.querySelector('.modal-img-container .placeholder-img');
+            if (placeholder) placeholder.style.display = 'none';
         });
         
         // Close modal when clicking outside
