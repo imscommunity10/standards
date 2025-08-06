@@ -803,153 +803,23 @@
             border-color: var(--secondary);
         }
 
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            h1 {
-                font-size: 3rem;
-            }
-            
-            .nav-buttons {
-                gap: 10px;
-            }
-            
-            .nav-btn {
-                padding: 8px 15px;
-                font-size: 0.9rem;
-            }
+        /* Remove circular image style, restore original modal and thumbnail image style */
+        .task-thumbnail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-bottom: 3px solid var(--accent);
+            background: #f0f0f0;
         }
-
-        @media (max-width: 768px) {
-            body {
-                padding-top: 70px;
-            }
-            
-            h1 {
-                font-size: 2.5rem;
-            }
-            
-            .theme-switcher {
-                position: relative;
-                top: auto;
-                right: auto;
-                justify-content: center;
-                margin-top: 20px;
-            }
-            
-            .card-container, .tasks-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .leadership-element {
-                display: none;
-            }
-            
-            .policy-section {
-                padding: 20px;
-            }
-            
-            /* Mobile Navigation */
-            .navbar {
-                padding: 10px 0;
-            }
-            
-            .nav-container {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-            }
-            
-            .nav-buttons {
-                flex-direction: column;
-                width: 100%;
-                gap: 10px;
-                max-height: 0;
-                overflow: hidden;
-                transition: max-height 0.4s ease;
-            }
-            
-            .nav-buttons.active {
-                max-height: 500px;
-                margin-top: 50px;
-            }
-            
-            .nav-btn {
-                width: 100%;
-                text-align: left;
-                padding: 12px 15px;
-            }
-            
-            .hamburger {
-                display: block;
-                position: absolute;
-                right: 20px;
-                top: 15px;
-                margin-bottom: 10px;
-            }
-            
-            /* Dropdown adjustments for mobile */
-            .dropdown-content {
-                position: static;
-                display: none;
-                box-shadow: none;
-                width: 100%;
-                margin-top: 0;
-                opacity: 1;
-                transform: none;
-            }
-            
-            .dropdown:hover .dropdown-content,
-            .dropdown.active .dropdown-content {
-                display: block;
-            }
-            
-            .dropdown-btn::after {
-                float: right;
-                margin-top: 5px;
-            }
-            
-            .dropdown:hover .dropdown-btn::after {
-                transform: none;
-            }
-
-            .modal-content {
-                padding: 20px;
-            }
-
-            .modal-img-container {
-                height: 250px;
-            }
+        .modal-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
-
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .section-title {
-                font-size: 2rem;
-            }
-            
-            .intro {
-                font-size: 1rem;
-            }
-            
-            .floating-nav-btn {
-                bottom: 20px;
-                right: 20px;
-                width: 50px;
-                height: 50px;
-                font-size: 1.3rem;
-            }
-
-            .modal-title {
-                font-size: 1.8rem;
-            }
-
-            .modal-img-container {
-                height: 200px;
-            }
-        }
+        .placeholder-img { display: none; }
 
         /* Theme-specific styles */
         body.light-theme {
@@ -1361,34 +1231,29 @@
                 `;
                 return;
             }
-            
             tasksContainer.innerHTML = '';
-            
             tasks.forEach(task => {
                 const taskCard = document.createElement('div');
                 taskCard.className = 'task-card';
-                taskCard.dataset.status = task['Status'].toLowerCase().replace('comming soon', 'coming soon');
-                
+                taskCard.dataset.status = task['Status']?.toLowerCase().replace('comming soon', 'coming soon') || '';
                 const previewLink = task['PreviewLink'] || '';
                 const taskName = task['Name of the Task?'] || 'Untitled Task';
-                
                 taskCard.innerHTML = `
                     <div class="task-thumbnail-container">
-                        <img src="${previewLink}" 
-                             alt="${taskName}" 
-                             class="task-thumbnail"
-                             onerror="handleImageError(this, '${taskName.replace(/'/g, "\\'")}')">
+                        <img src="${previewLink}" alt="${taskName}" class="task-thumbnail" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder-img').style.display='flex';">
+                        <div class="placeholder-img" style="flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;display:none;">
+                            <i class="fas fa-image" style="font-size:3rem;color:#ccc;"></i>
+                            <p>Image unavailable</p>
+                        </div>
                     </div>
                     <div class="task-content">
                         <h3 class="task-title">${taskName}</h3>
                         <div class="task-status ${getStatusClass(task['Status'])}">${task['Status']}</div>
                     </div>
                 `;
-                
                 taskCard.addEventListener('click', () => {
                     showTaskDetails(task);
                 });
-                
                 tasksContainer.appendChild(taskCard);
             });
         };
@@ -1412,22 +1277,21 @@
         // Show task details in modal
         const showTaskDetails = (task) => {
             document.getElementById('modalTitle').textContent = task['Name of the Task?'] || 'Untitled Task';
-            
             // Set image
             const modalImg = document.getElementById('modalImg');
+            modalImg.style.display = '';
             modalImg.src = task['PreviewLink'] || '';
             modalImg.alt = task['Name of the Task?'] || 'Task Thumbnail';
-            
+            modalImg.className = 'modal-img';
+            // Hide placeholder if present
+            const placeholder = modalImg.parentElement.querySelector('.placeholder-img');
+            if (placeholder) placeholder.style.display = 'none';
             // Handle image error in modal
             modalImg.onerror = function() {
                 this.onerror = null;
                 this.src = '';
-                this.parentElement.innerHTML = `
-                    <div class="placeholder-img">
-                        <i class="fas fa-image"></i>
-                        <p>Image unavailable</p>
-                    </div>
-                `;
+                this.style.display = 'none';
+                if (placeholder) placeholder.style.display = 'flex';
             };
             
             // Set status
@@ -1484,6 +1348,14 @@
         // Close modal
         modalClose.addEventListener('click', () => {
             taskModal.style.display = 'none';
+            const modalImg = document.getElementById('modalImg');
+            if (modalImg) {
+                modalImg.src = '';
+                modalImg.style.display = '';
+                modalImg.className = 'modal-img';
+            }
+            const placeholder = document.querySelector('.modal-img-container .placeholder-img');
+            if (placeholder) placeholder.style.display = 'none';
         });
         
         // Close modal when clicking outside
