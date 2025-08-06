@@ -80,6 +80,7 @@
             z-index: -1;
             opacity: 0.3;
         }
+        
 
         /* Leadership-themed elements */
         .leadership-element {
@@ -502,11 +503,91 @@
             margin: 50px 0;
         }
 
-	@media (max-width: 768px) {
-		.tasks-container {
-        		grid-template-columns: 1fr;
-    		}
-	}
+
+
+
+@media (max-width: 768px) {
+    body {
+        padding-top: 70px;
+    }
+    h1 {
+        font-size: 2.5rem;
+    }
+    .theme-switcher {
+        position: relative;
+        top: auto;
+        right: auto;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .card-container {
+        grid-template-columns: 1fr;
+    }
+    .leadership-element {
+        display: none;
+    }
+    .policy-section {
+        padding: 20px;
+    }
+    /* Mobile Navigation */
+    .navbar {
+        padding: 10px 0;
+    }
+    .nav-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .nav-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease;
+    }
+    .nav-buttons.active {
+        max-height: 500px;
+        margin-top: 50px;
+    }
+    .nav-btn {
+        width: 100%;
+        text-align: left;
+        padding: 12px 15px;
+    }
+    .hamburger {
+        display: block;
+        position: absolute;
+        right: 20px;
+        top: 15px;
+        margin-bottom: 10px;
+    }
+    /* Dropdown adjustments for mobile */
+    .dropdown-content {
+        position: static;
+        display: none;
+        box-shadow: none;
+        width: 100%;
+        margin-top: 0;
+        opacity: 1;
+        transform: none;
+    }
+    .dropdown:hover .dropdown-content,
+    .dropdown.active .dropdown-content {
+        display: block;
+    }
+    .dropdown-btn::after {
+        float: right;
+        margin-top: 5px;
+    }
+    .dropdown:hover .dropdown-btn::after {
+        transform: none;
+    }
+}
+
+    
+
+
 
         .task-card {
             background: var(--card);
@@ -524,6 +605,7 @@
             transform: translateY(-10px);
             box-shadow: 0 15px 40px var(--shadow);
         }
+
 
         /* Update thumbnail and modal image to 16:9 aspect ratio */
         .task-thumbnail-container {
@@ -903,6 +985,38 @@
         .neon-theme .task-card:hover {
             box-shadow: 0 0 25px rgba(0, 243, 255, 0.2), 0 15px 40px var(--shadow);
         }
+    /* Make Official Sites button visually distinct and attractive */
+    .official-sites-btn {
+        background: linear-gradient(135deg, #ff00c8 0%, #00f3ff 100%) !important;
+        color: #fff !important;
+        border: 2px solid #ffd700 !important;
+        box-shadow: 0 0 20px #00f3ff, 0 8px 24px #ff00c8 !important;
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
+        letter-spacing: 1px !important;
+        text-shadow: 0 2px 8px #00f3ff, 0 1px 2px #ff00c8 !important;
+        border-radius: 12px !important;
+        padding: 12px 28px !important;
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1) !important;
+        position: relative !important;
+        z-index: 2 !important;
+        overflow: visible !important;
+    }
+    .official-sites-btn:hover, .official-sites-btn:focus {
+        background: linear-gradient(135deg, #ffd700 0%, #ff00c8 100%) !important;
+        color: #fff !important;
+        box-shadow: 0 0 30px #ffd700, 0 12px 32px #ff00c8 !important;
+        border-color: #00f3ff !important;
+        transform: scale(1.08) translateY(-2px) !important;
+        text-shadow: 0 2px 12px #ffd700, 0 1px 2px #ff00c8 !important;
+    }
+    @media (max-width: 768px) {
+        .official-sites-btn {
+            font-size: 1rem !important;
+            padding: 12px 18px !important;
+            border-radius: 10px !important;
+        }
+    }
     </style>
 </head>
 <body class="light-theme">
@@ -955,7 +1069,26 @@
                         </a>
                     </div>
                 </div>
-            </div>
+
+
+                                <!-- Visit Official Sites Dropdown -->
+                <div class="dropdown" id="officialSitesDropdown">
+                    <button class="nav-btn official-sites-btn dropdown-btn">
+                        <i class="fas fa-globe"></i> Visit Official Sites
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="https://islamicmessagingsystem.com/" target="_blank">
+                            <i class="fas fa-home"></i> Website
+                        </a>
+                        <a href="https://islamicmessagingsystem.com/register/" target="_blank">
+                            <i class="fas fa-user-plus"></i> Registration
+                        </a>
+                        <a href="https://www.youtube.com/@IMSPRODUCTIONSOFFICIAL" target="_blank">
+                            <i class="fab fa-youtube"></i> YouTube Channel
+                        </a>
+                    </div>
+                </div>
+
         </div>
     </nav>
     
@@ -1418,10 +1551,34 @@
                     tab.classList.remove('active');
                 });
                 e.target.classList.add('active');
-                
                 // Filter tasks
                 const status = e.target.dataset.status;
                 filterTasksByStatus(status);
+            }
+        });
+
+        // Mobile dropdown functionality
+        const officialSitesDropdown = document.getElementById('officialSitesDropdown');
+        // For mobile: toggle dropdown on click
+        officialSitesDropdown.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                // If a link is clicked, let it open normally
+                if (e.target.tagName === 'A') {
+                    // Do not preventDefault, let browser handle
+                    return;
+                }
+                // Only toggle dropdown if the button itself is clicked
+                if (e.target.closest('.official-sites-btn')) {
+                    e.preventDefault();
+                    this.classList.toggle('active');
+                }
+            }
+        });
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth > 768) return;
+            if (!officialSitesDropdown.contains(e.target)) {
+                officialSitesDropdown.classList.remove('active');
             }
         });
     </script>
