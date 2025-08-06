@@ -1238,13 +1238,10 @@
                 taskCard.dataset.status = task['Status']?.toLowerCase().replace('comming soon', 'coming soon') || '';
                 const previewLink = task['PreviewLink'] || '';
                 const taskName = task['Name of the Task?'] || 'Untitled Task';
+                // Only show image if previewLink is present
                 taskCard.innerHTML = `
                     <div class="task-thumbnail-container">
-                        <img src="${previewLink}" alt="${taskName}" class="task-thumbnail" onerror="this.style.display='none';this.parentElement.querySelector('.placeholder-img').style.display='flex';">
-                        <div class="placeholder-img" style="flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;display:none;">
-                            <i class="fas fa-image" style="font-size:3rem;color:#ccc;"></i>
-                            <p>Image unavailable</p>
-                        </div>
+                        ${previewLink ? `<img src="${previewLink}" alt="${taskName}" class="task-thumbnail">` : `<div class=\"placeholder-img\" style=\"flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;display:flex;\"><i class=\"fas fa-image\" style=\"font-size:3rem;color:#ccc;\"></i><p>Image unavailable</p></div>`}
                     </div>
                     <div class="task-content">
                         <h3 class="task-title">${taskName}</h3>
@@ -1279,13 +1276,17 @@
             document.getElementById('modalTitle').textContent = task['Name of the Task?'] || 'Untitled Task';
             // Set image
             const modalImg = document.getElementById('modalImg');
-            modalImg.style.display = '';
-            modalImg.src = task['PreviewLink'] || '';
-            modalImg.alt = task['Name of the Task?'] || 'Task Thumbnail';
+            if (task['PreviewLink']) {
+                modalImg.style.display = '';
+                modalImg.src = task['PreviewLink'];
+                modalImg.alt = task['Name of the Task?'] || 'Task Thumbnail';
+            } else {
+                modalImg.style.display = 'none';
+            }
             modalImg.className = 'modal-img';
             // Hide placeholder if present
             const placeholder = modalImg.parentElement.querySelector('.placeholder-img');
-            if (placeholder) placeholder.style.display = 'none';
+            if (placeholder) placeholder.style.display = task['PreviewLink'] ? 'none' : 'flex';
             // Handle image error in modal
             modalImg.onerror = function() {
                 this.onerror = null;
