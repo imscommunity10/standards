@@ -525,14 +525,14 @@
             box-shadow: 0 15px 40px var(--shadow);
         }
 
+        /* Update thumbnail and modal image to 16:9 aspect ratio */
         .task-thumbnail-container {
             position: relative;
             width: 100%;
-            padding-top: 100%; /* 1:1 Aspect Ratio */
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
             overflow: hidden;
-            background: rgba(0,0,0,0.05); /* Fallback background */
+            background: rgba(0,0,0,0.05);
         }
-
         .task-thumbnail {
             position: absolute;
             top: 0;
@@ -541,7 +541,25 @@
             height: 100%;
             object-fit: cover;
             border-bottom: 3px solid var(--accent);
-            background: #f0f0f0; /* Fallback background */
+            background: #f0f0f0;
+        }
+        .modal-img-container {
+            width: 100%;
+            aspect-ratio: 16/9;
+            max-height: 350px;
+            overflow: hidden;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid var(--divider);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.05);
+        }
+        .modal-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .task-content {
@@ -638,7 +656,8 @@
 
         .modal-img-container {
             width: 100%;
-            height: 350px;
+            aspect-ratio: 16/9;
+            max-height: 350px;
             overflow: hidden;
             border-radius: 10px;
             margin-bottom: 25px;
