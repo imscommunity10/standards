@@ -1027,8 +1027,16 @@
         
         officialSitesDropdown.addEventListener('click', function(e) {
             if (window.innerWidth <= 768) {
-                e.preventDefault();
-                this.classList.toggle('active');
+                // If a link is clicked, let it open normally
+                if (e.target.tagName === 'A') {
+                    // Do not preventDefault, let browser handle
+                    return;
+                }
+                // Only toggle dropdown if the button itself is clicked
+                if (e.target.closest('.official-sites-btn')) {
+                    e.preventDefault();
+                    this.classList.toggle('active');
+                }
             }
         });
         
