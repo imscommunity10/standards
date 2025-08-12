@@ -640,6 +640,7 @@
             align-items: center;
             justify-content: center;
             background: rgba(0,0,0,0.05);
+            cursor: zoom-in;
         }
         .modal-img {
             width: 100%;
@@ -745,7 +746,7 @@
         .modal-img-container {
     width: 100%;
     aspect-ratio: 16/9;
-    max-height: 350px;
+    max-height: 450px;
     overflow: hidden;
     border-radius: 10px;
     margin-bottom: 25px;
@@ -1065,7 +1066,7 @@
                         <i class="fas fa-list-check"></i> Tasks
                     </button>
                     <div class="dropdown-content">
-                        <a href="Tasks_IMS.html">
+                        <a href="https://islamicmessagingsystem.com/ims-tasks/">
                             <i class="fas fa-network-wired"></i> IMS
                         </a>
                         <a href="Tasks_Community.html">
@@ -1106,8 +1107,8 @@
 
     <div class="container">
         <header>
-            <h1 id="page-title">IMS Tasks</h1>
-            <p class="intro">Explore current tasks and initiatives organized by the IMS community</p>
+            <h1 id="page-title">All Tasks</h1>
+            <p class="intro">Explore current tasks and initiatives organized by the community</p>
             
             <div class="theme-switcher">
                 <button class="theme-btn light-btn" title="Light Theme"><i class="fas fa-sun"></i></button>
@@ -1126,7 +1127,7 @@
 
         <!-- Tasks Display Section -->
         <section>
-            <h2 class="section-title">All Tasks</h2>
+            <!--h2 class="section-title">All Tasks</h2-->
             <div class="tasks-container" id="tasksContainer">
                 <div class="loader">
                     <div class="spinner"></div>
@@ -1189,7 +1190,7 @@
     </div>
 
     <footer>
-        <p>IMS Tasks Display &copy; 2023</p>
+        <p>Community Tasks Display &copy; 2025</p>
     </footer>
 
     <script>
@@ -1276,7 +1277,7 @@
             
             if (pageType && titleMap[pageType]) {
                 document.getElementById('page-title').textContent = titleMap[pageType];
-                document.querySelector('.section-title').textContent = titleMap[pageType];
+                //document.querySelector('.section-title').textContent = titleMap[pageType];
             }
         };
         
