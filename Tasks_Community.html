@@ -1306,26 +1306,26 @@
             let buttons = '';
             
             links.forEach(link => {
-                let icon = 'fa-link';
+                let icon = 'fas fa-link';   // default solid link icon
                 let platform = 'Link';
                 
                 if (link.includes('youtube.com') || link.includes('youtu.be')) {
-                    icon = 'fa-youtube';
+                    icon = 'fab fa-youtube';
                     platform = 'YouTube';
-                } else if (link.includes('twitter.com')) {
-                    icon = 'fa-twitter';
-                    platform = 'Twitter';
+                } else if (link.includes('twitter.com') || link.includes('x.com')) {
+                    icon = 'fab fa-twitter';
+                    platform = 'Twitter / X';
                 } else if (link.includes('drive.google.com')) {
-                    icon = 'fa-google-drive';
+                    icon = 'fab fa-google-drive';
                     platform = 'Google Drive';
                 } else if (link.includes('docs.google.com')) {
-                    icon = 'fa-google';
+                    icon = 'fab fa-google';
                     platform = 'Google Docs';
                 } else if (link.includes('zoom.us')) {
-                    icon = 'fa-video';
+                    icon = 'fas fa-video';
                     platform = 'Zoom';
                 } else if (link.includes('facebook.com')) {
-                    icon = 'fa-facebook';
+                    icon = 'fab fa-facebook';
                     platform = 'Facebook';
                 }
                 
